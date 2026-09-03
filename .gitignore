@@ -1,0 +1,22 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# artefatos de ml (gerados pelo treino)
+api/artefatos/*.joblib
+api/artefatos/*.npz
+
+# dataset (baixado a parte, grande demais para o repo)
+BooksDataset.csv
+BooksDataset.csv.zip
+*.backup
+
+# ide
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/

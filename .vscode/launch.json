@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "API (uvicorn)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.Main:Aplicacao", "--reload"],
+      "cwd": "${workspaceFolder}/api",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Carregar dataset",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "app.Scripts.CarregarDataset",
+      "cwd": "${workspaceFolder}/api",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Treinar recomendador",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "app.Scripts.TreinarRecomendador",
+      "args": ["--persistir"],
+      "cwd": "${workspaceFolder}/api",
+      "console": "integratedTerminal"
+    }
+  ]
+}
