@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Explorar Livros | BookMatch</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+    <a href="index.html" class="logo">
+        BookMatch
+    </a>
+
+    <nav class="menu">
+        <a href="index.html">Início</a>
+        <a href="pesquisa.html">Explorar</a>
+        <a href="salvos.html">Meus Livros</a>
+        <a href="recomendacoes.html">Recomendações</a>
+    </nav>
+
+    <a href="login.html" class="btn-login">
+        Entrar
+    </a>
+
+</header>
+
+
+<main>
+
+    <section class="pesquisa-topo">
+
+        <div class="pesquisa-topo-conteudo">
+
+            <span class="subtitulo">
+                Explore
+            </span>
+
+            <h1>
+                Encontre novos livros
+            </h1>
+
+            <p>
+                Pesquise por título, autor ou categoria.
+            </p>
+
+
+            <form class="barra-pesquisa">
+
+                <input
+                    type="text"
+                    placeholder="Pesquisar livros..."
+                >
+
+                <button type="button">
+                    Pesquisar
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <section class="explorar-container">
+
+        <aside class="filtros">
+
+            <h3>Filtros</h3>
+
+
+            <div class="grupo-filtro">
+
+                <label for="categoria">
+                    Categoria
+                </label>
+
+                <select id="categoria">
+
+                    <option>
+                        Todas
+                    </option>
+
+                    <option>
+                        Ficção
+                    </option>
+
+                    <option>
+                        Fantasia
+                    </option>
+
+                    <option>
+                        História
+                    </option>
+
+                    <option>
+                        Romance
+                    </option>
+
+                    <option>
+                        Tecnologia
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="grupo-filtro">
+
+                <label for="ano">
+                    Ano de publicação
+                </label>
+
+                <select id="ano">
+
+                    <option>
+                        Todos
+                    </option>
+
+                    <option>
+                        2000 - atual
+                    </option>
+
+                    <option>
+                        1990 - 1999
+                    </option>
+
+                    <option>
+                        1980 - 1989
+                    </option>
+
+                    <option>
+                        Antes de 1980
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button class="btn-filtro">
+                Aplicar filtros
+            </button>
+
+        </aside>
+
+
+        <section class="resultados">
+
+            <div class="resultados-cabecalho">
+
+                <div>
+
+                    <span class="subtitulo">
+                        Resultados
+                    </span>
+
+                    <h2>
+                        Livros encontrados
+                    </h2>
+
+                </div>
+
+                <span class="quantidade-resultados">
+                    103.063 livros disponíveis
+                </span>
+
+            </div>
+
+
+            <div class="livros-grid">
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            Ficção
+                        </span>
+
+                        <h3>
+                            Nome do Livro
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            Fantasia
+                        </span>
+
+                        <h3>
+                            Outra História
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            Literatura
+                        </span>
+
+                        <h3>
+                            Livro Recomendado
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            História
+                        </span>
+
+                        <h3>
+                            Uma Nova Leitura
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            Tecnologia
+                        </span>
+
+                        <h3>
+                            Livro de Tecnologia
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+
+                <article class="livro-card">
+
+                    <div class="livro-capa">
+                        <span>BOOK</span>
+                    </div>
+
+                    <div class="livro-info">
+
+                        <span class="categoria">
+                            Romance
+                        </span>
+
+                        <h3>
+                            Uma História de Amor
+                        </h3>
+
+                        <p>
+                            Nome do Autor
+                        </p>
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <strong>
+        BookMatch
+    </strong>
+
+    <p>
+        Projeto Integrador — DSM 6º Semestre — FATEC Franca
+    </p>
+
+</footer>
+
+</body>
+</html>

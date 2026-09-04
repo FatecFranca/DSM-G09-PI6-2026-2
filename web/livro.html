@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detalhes do Livro | BookMatch</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="header">
+    <a href="index.html" class="logo">BookMatch</a>
+
+    <nav class="menu">
+        <a href="index.html">Início</a>
+        <a href="pesquisa.html">Explorar</a>
+        <a href="salvos.html">Meus Livros</a>
+        <a href="recomendacoes.html">Recomendações</a>
+    </nav>
+
+    <a href="login.html" class="btn-login">Entrar</a>
+</header>
+
+<main>
+
+    <section class="detalhes-livro">
+
+        <a href="pesquisa.html" class="voltar-link">
+            ← Voltar para explorar
+        </a>
+
+        <div class="detalhes-grid">
+
+            <div class="detalhes-capa">
+                <span>BOOK</span>
+            </div>
+
+            <div class="detalhes-conteudo">
+
+                <span class="categoria">
+                    Ficção
+                </span>
+
+                <h1>
+                    Nome do Livro
+                </h1>
+
+                <p class="detalhes-autor">
+                    por Nome do Autor
+                </p>
+
+                <div class="detalhes-meta">
+
+                    <div>
+                        <span>Editora</span>
+                        <strong>Editora Exemplo</strong>
+                    </div>
+
+                    <div>
+                        <span>Publicação</span>
+                        <strong>Janeiro de 2001</strong>
+                    </div>
+
+                    <div>
+                        <span>Preço inicial</span>
+                        <strong>US$ 8,79</strong>
+                    </div>
+
+                </div>
+
+                <div class="detalhes-acoes">
+
+                    <button class="btn-salvar-livro" type="button">
+                        ♡ Salvar livro
+                    </button>
+
+                    <a href="recomendacoes.html" class="btn-secundario">
+                        Ver semelhantes
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="descricao-livro">
+
+        <div class="descricao-conteudo">
+
+            <span class="subtitulo">
+                Sobre o livro
+            </span>
+
+            <h2>
+                Descrição
+            </h2>
+
+            <p>
+                Esta área exibirá a descrição completa do livro.
+                Na versão integrada do sistema, o conteúdo será carregado
+                diretamente da API com base no livro selecionado pelo usuário.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="secao">
+
+        <div class="secao-cabecalho">
+
+            <div>
+                <span class="subtitulo">
+                    Você também pode gostar
+                </span>
+
+                <h2>
+                    Livros semelhantes
+                </h2>
+            </div>
+
+            <a href="recomendacoes.html">
+                Ver mais →
+            </a>
+
+        </div>
+
+
+        <div class="livros-grid">
+
+            <article class="livro-card">
+
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Ficção
+                    </span>
+
+                    <h3>
+                        Livro Semelhante
+                    </h3>
+
+                    <p>
+                        Nome do Autor
+                    </p>
+
+                    <a href="livro.html">
+                        Ver detalhes
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="livro-card">
+
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Literatura
+                    </span>
+
+                    <h3>
+                        Outra Recomendação
+                    </h3>
+
+                    <p>
+                        Outro Autor
+                    </p>
+
+                    <a href="livro.html">
+                        Ver detalhes
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="livro-card">
+
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Romance
+                    </span>
+
+                    <h3>
+                        Nova História
+                    </h3>
+
+                    <p>
+                        Nome do Autor
+                    </p>
+
+                    <a href="livro.html">
+                        Ver detalhes
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <strong>
+        BookMatch
+    </strong>
+
+    <p>
+        Projeto Integrador — DSM 6º Semestre — FATEC Franca
+    </p>
+
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

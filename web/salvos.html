@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meus Livros | BookMatch</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="header">
+    <a href="index.html" class="logo">BookMatch</a>
+
+    <nav class="menu">
+        <a href="index.html">Início</a>
+        <a href="pesquisa.html">Explorar</a>
+        <a href="salvos.html" class="menu-ativo">Meus Livros</a>
+        <a href="recomendacoes.html">Recomendações</a>
+    </nav>
+
+    <a href="login.html" class="btn-login">Entrar</a>
+</header>
+
+
+<main>
+
+    <!-- HERO / TOPO -->
+    <section class="pagina-topo pagina-topo-salvos">
+
+        <div class="pagina-topo-conteudo">
+
+            <span class="tag">
+                Sua biblioteca pessoal
+            </span>
+
+            <h1>
+                Seus livros,
+                <span>sempre por perto.</span>
+            </h1>
+
+            <p>
+                Acompanhe os títulos que você salvou e encontre
+                facilmente sua próxima leitura.
+            </p>
+
+            <div class="resumo-biblioteca">
+
+                <div class="resumo-item">
+                    <strong>4</strong>
+                    <span>Livros salvos</span>
+                </div>
+
+                <div class="resumo-divisor"></div>
+
+                <div class="resumo-item">
+                    <strong>4</strong>
+                    <span>Categorias</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LIVROS SALVOS -->
+    <section class="salvos-secao">
+
+        <div class="salvos-cabecalho">
+
+            <div>
+
+                <span class="subtitulo">
+                    Biblioteca
+                </span>
+
+                <h2>
+                    Livros salvos
+                </h2>
+
+                <p>
+                    Continue de onde parou ou explore novamente seus favoritos.
+                </p>
+
+            </div>
+
+
+            <div class="salvos-acoes">
+
+                <input
+                    type="search"
+                    placeholder="Pesquisar nos salvos..."
+                    aria-label="Pesquisar nos livros salvos"
+                >
+
+                <select aria-label="Ordenar livros salvos">
+                    <option>Mais recentes</option>
+                    <option>Mais antigos</option>
+                    <option>Título A-Z</option>
+                    <option>Título Z-A</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="livros-grid">
+
+            <!-- LIVRO 1 -->
+            <article class="livro-card">
+
+                <div class="livro-capa">
+
+                    <span>BOOK</span>
+
+                    <button
+                        class="btn-remover-salvo"
+                        type="button"
+                        title="Remover dos salvos"
+                        aria-label="Remover livro dos salvos"
+                    >
+                        ♥
+                    </button>
+
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Ficção
+                    </span>
+
+                    <h3>
+                        Nome do Livro
+                    </h3>
+
+                    <p>
+                        Nome do Autor
+                    </p>
+
+                    <div class="card-acoes">
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                        <button type="button">
+                            Remover
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- LIVRO 2 -->
+            <article class="livro-card">
+
+                <div class="livro-capa">
+
+                    <span>BOOK</span>
+
+                    <button
+                        class="btn-remover-salvo"
+                        type="button"
+                        title="Remover dos salvos"
+                        aria-label="Remover livro dos salvos"
+                    >
+                        ♥
+                    </button>
+
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Fantasia
+                    </span>
+
+                    <h3>
+                        Outra História
+                    </h3>
+
+                    <p>
+                        Outro Autor
+                    </p>
+
+                    <div class="card-acoes">
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                        <button type="button">
+                            Remover
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- LIVRO 3 -->
+            <article class="livro-card">
+
+                <div class="livro-capa">
+
+                    <span>BOOK</span>
+
+                    <button
+                        class="btn-remover-salvo"
+                        type="button"
+                        title="Remover dos salvos"
+                        aria-label="Remover livro dos salvos"
+                    >
+                        ♥
+                    </button>
+
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Literatura
+                    </span>
+
+                    <h3>
+                        Livro Recomendado
+                    </h3>
+
+                    <p>
+                        Nome do Autor
+                    </p>
+
+                    <div class="card-acoes">
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                        <button type="button">
+                            Remover
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- LIVRO 4 -->
+            <article class="livro-card">
+
+                <div class="livro-capa">
+
+                    <span>BOOK</span>
+
+                    <button
+                        class="btn-remover-salvo"
+                        type="button"
+                        title="Remover dos salvos"
+                        aria-label="Remover livro dos salvos"
+                    >
+                        ♥
+                    </button>
+
+                </div>
+
+                <div class="livro-info">
+
+                    <span class="categoria">
+                        Aventura
+                    </span>
+
+                    <h3>
+                        Nova Leitura
+                    </h3>
+
+                    <p>
+                        Nome do Autor
+                    </p>
+
+                    <div class="card-acoes">
+
+                        <a href="livro.html">
+                            Ver detalhes
+                        </a>
+
+                        <button type="button">
+                            Remover
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <!-- BLOCO FINAL -->
+        <div class="salvos-explorar">
+
+            <div>
+
+                <span class="subtitulo">
+                    Continue explorando
+                </span>
+
+                <h2>
+                    Ainda há muito para descobrir.
+                </h2>
+
+                <p>
+                    Explore o catálogo, descubra novos autores e salve
+                    os livros que mais chamarem sua atenção.
+                </p>
+
+            </div>
+
+            <a href="pesquisa.html" class="btn-principal">
+                Explorar livros
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+
+    <strong>
+        BookMatch
+    </strong>
+
+    <p>
+        Projeto Integrador — DSM 6º Semestre — FATEC Franca
+    </p>
+
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMatch</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="header">
+    <a href="index.html" class="logo">BookMatch</a>
+
+    <nav class="menu">
+        <a href="index.html">Início</a>
+        <a href="pesquisa.html">Explorar</a>
+        <a href="salvos.html">Meus Livros</a>
+        <a href="recomendacoes.html">Recomendações</a>
+    </nav>
+
+    <a href="login.html" class="btn-login">Entrar</a>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="hero-conteudo">
+
+            <span class="tag">Descubra novas histórias</span>
+
+            <h1>
+                Encontre seu próximo
+                <span>livro favorito.</span>
+            </h1>
+
+            <p>
+                Explore milhares de livros, salve os títulos que mais
+                chamarem sua atenção e descubra novas recomendações.
+            </p>
+
+            <form class="barra-pesquisa" action="pesquisa.html">
+                <input
+                    type="text"
+                    name="busca"
+                    placeholder="Pesquise por título, autor ou categoria..."
+                >
+
+                <button type="submit">
+                    Pesquisar
+                </button>
+            </form>
+
+        </div>
+    </section>
+
+    <section class="secao">
+
+        <div class="secao-cabecalho">
+            <div>
+                <span class="subtitulo">Explore</span>
+                <h2>Livros em destaque</h2>
+            </div>
+
+            <a href="pesquisa.html">Ver todos →</a>
+        </div>
+
+        <div class="livros-grid">
+
+            <article class="livro-card">
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+                    <span class="categoria">Ficção</span>
+                    <h3>Nome do Livro</h3>
+                    <p>Nome do Autor</p>
+                    <a href="livro.html">Ver detalhes</a>
+                </div>
+            </article>
+
+            <article class="livro-card">
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+                    <span class="categoria">Fantasia</span>
+                    <h3>Outra História</h3>
+                    <p>Nome do Autor</p>
+                    <a href="livro.html">Ver detalhes</a>
+                </div>
+            </article>
+
+            <article class="livro-card">
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+                    <span class="categoria">Literatura</span>
+                    <h3>Livro Recomendado</h3>
+                    <p>Nome do Autor</p>
+                    <a href="livro.html">Ver detalhes</a>
+                </div>
+            </article>
+
+            <article class="livro-card">
+                <div class="livro-capa">
+                    <span>BOOK</span>
+                </div>
+
+                <div class="livro-info">
+                    <span class="categoria">Aventura</span>
+                    <h3>Nova Leitura</h3>
+                    <p>Nome do Autor</p>
+                    <a href="livro.html">Ver detalhes</a>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="footer">
+    <strong>BookMatch</strong>
+    <p>Projeto Integrador — DSM 6º Semestre — FATEC Franca</p>
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
