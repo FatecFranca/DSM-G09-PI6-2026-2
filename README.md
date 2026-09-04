@@ -56,4 +56,13 @@ Principais telas:
 - `salvos.html` — biblioteca de livros salvos
 - `recomendacoes.html` — recomendações para o usuário
 
+## Arquitetura em Nuvem (Planejamento)
+
+Para atender à arquitetura da aplicação e respeitar os Requisitos Não Funcionais (como performance e sistema modular), a infraestrutura foi desenhada de forma distribuída e assíncrona, utilizando o ecossistema **Google Cloud Platform (GCP)**:
+
+- **Front-end:** Google Cloud Storage (Static Website Hosting) ou Firebase Hosting para servir os arquivos estáticos (HTML/CSS/JS) com alta disponibilidade e baixo custo.
+- **Back-end (API Python):** Google Compute Engine (GCE) com instância `e2-micro` para hospedar a API FastAPI, mantendo o controle do ambiente Linux e das dependências.
+- **Banco de Dados:** Google Cloud SQL (PostgreSQL) para garantir a integridade relacional das tabelas de usuários, livros e interações, automatizando rotinas de backup e segurança.
+- **Mineração de Dados e Mensageria (IA):** Arquitetura orientada a eventos usando **Google Cloud Pub/Sub**. As interações dos usuários (ex: salvar um livro) disparam eventos no tópico `aula-pub`. Em segundo plano, o script de Machine Learning atua como *Subscriber*, consumindo as mensagens de forma assíncrona para recalcular recomendações sem bloquear o tempo de resposta da API principal.
+
 Instruções de execução do back-end em [`api/README.md`](api/README.md).
