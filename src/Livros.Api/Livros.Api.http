@@ -1,0 +1,56 @@
+@host = http://localhost:5199
+
+### saude
+GET {{host}}/saude
+
+### lista paginada
+GET {{host}}/livros?pagina=1&tamanhoPagina=5
+
+### filtro por categoria e busca
+GET {{host}}/livros?categoria=Fiction&busca=soul&tamanhoPagina=5
+
+### detalhe
+GET {{host}}/livros/1
+
+### recomendacoes
+GET {{host}}/livros/1/recomendacoes?total=5
+
+### categorias
+GET {{host}}/categorias?minimoDeLivros=100&limite=20
+
+### criar usuario
+POST {{host}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Gustavo Schizzari",
+  "email": "gustavo@exemplo.com",
+  "senha": "senhaforte123"
+}
+
+### listar usuarios
+GET {{host}}/usuarios?pagina=1&tamanhoPagina=10
+
+### detalhe do usuario
+GET {{host}}/usuarios/1
+
+### atualizar usuario
+PUT {{host}}/usuarios/1
+Content-Type: application/json
+
+{
+  "nome": "Gustavo S.",
+  "email": "gustavo.s@exemplo.com"
+}
+
+### trocar senha
+PUT {{host}}/usuarios/1/senha
+Content-Type: application/json
+
+{
+  "senha_atual": "senhaforte123",
+  "nova_senha": "outrasenha456"
+}
+
+### remover usuario
+DELETE {{host}}/usuarios/1

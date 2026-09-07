@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Livros.Api/Livros.Api.csproj" />
+  <Project Path="Livros.Dados/Livros.Dados.csproj" />
+  <Project Path="Livros.Dominio/Livros.Dominio.csproj" />
+</Solution>

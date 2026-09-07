@@ -18,16 +18,23 @@ personalizadas.
 
 | Pasta | Responsável | O que tem |
 |---|---|---|
-| `api/` | back-end | API FastAPI, ingestão do dataset e modelo de recomendação |
+| `src/` | back-end | API em C# / ASP.NET Core com EF Core |
+| `ml/` | back-end | Pipeline Python: ingestão do dataset e modelo de recomendação |
 | `web/` | front-end | Protótipo web, telas estáticas e navegação da aplicação |
+
+O back-end é poliglota de propósito: a API é C# (tipagem em tempo de compilação e
+migrations do EF Core) e a mineração de dados é Python (pandas e scikit-learn).
+Os dois lados não conversam por HTTP — o Python grava o resultado do modelo na tabela
+`livros_similares` e a API lê de lá.
 
 O `BooksDataset.csv` fica na raiz, fora do versionamento (descompacte o `.zip` antes de
 rodar a ingestão).
 
 ## Sprint 1 — entregue
 
-- estrutura da API em FastAPI, com Swagger e os quatro endpoints do front
-- mapeamento SQLAlchemy do schema do banco, mais a tabela `livros_similares`
+- estrutura da API em ASP.NET Core, com Swagger e os endpoints do front
+- CRUD de usuário, com senha guardada em hash (PBKDF2)
+- mapeamento EF Core do schema do banco, mais a tabela `livros_similares`
 - ingestão do `BooksDataset.csv`: limpeza, normalização e carga via `COPY`
 - pipeline de ML: TF-IDF sobre o conteúdo do livro, cosseno em blocos e persistência
   do top-N para o endpoint não recalcular a cada requisição
@@ -61,8 +68,11 @@ Principais telas:
 Para atender à arquitetura da aplicação e respeitar os Requisitos Não Funcionais (como performance e sistema modular), a infraestrutura foi desenhada de forma distribuída e assíncrona, utilizando o ecossistema **Google Cloud Platform (GCP)**:
 
 - **Front-end:** Google Cloud Storage (Static Website Hosting) ou Firebase Hosting para servir os arquivos estáticos (HTML/CSS/JS) com alta disponibilidade e baixo custo.
-- **Back-end (API Python):** Google Compute Engine (GCE) com instância `e2-micro` para hospedar a API FastAPI, mantendo o controle do ambiente Linux e das dependências.
+- **Back-end (API C#):** Google Compute Engine (GCE) com instância `e2-micro` para hospedar a API ASP.NET Core, mantendo o controle do ambiente Linux e das dependências.
 - **Banco de Dados:** Google Cloud SQL (PostgreSQL) para garantir a integridade relacional das tabelas de usuários, livros e interações, automatizando rotinas de backup e segurança.
 - **Mineração de Dados e Mensageria (IA):** Arquitetura orientada a eventos usando **Google Cloud Pub/Sub**. As interações dos usuários (ex: salvar um livro) disparam eventos no tópico `aula-pub`. Em segundo plano, o script de Machine Learning atua como *Subscriber*, consumindo as mensagens de forma assíncrona para recalcular recomendações sem bloquear o tempo de resposta da API principal.
 
-Instruções de execução do back-end em [`api/README.md`](api/README.md).
+Instruções de execução:
+
+- API C#: [`src/README.md`](src/README.md)
+- Pipeline de ML: [`ml/README.md`](ml/README.md)

@@ -1,6 +1,7 @@
 {
-  "python.defaultInterpreterPath": "${workspaceFolder}/api/.venv/Scripts/python.exe",
+  "python.defaultInterpreterPath": "${workspaceFolder}/ml/.venv/Scripts/python.exe",
   "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": ["api"],
-  "python.analysis.extraPaths": ["${workspaceFolder}/api"]
+  "python.testing.cwd": "${workspaceFolder}/ml",
+  "python.analysis.extraPaths": ["${workspaceFolder}/ml"],
+  "dotnet.defaultSolution": "src/Livros.slnx"
 }

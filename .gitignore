@@ -1,13 +1,20 @@
+# .net
+bin/
+obj/
+*.user
+.vs/
+
 # python
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .venv/
 venv/
 .env
 
 # artefatos de ml (gerados pelo treino)
-api/artefatos/*.joblib
-api/artefatos/*.npz
+ml/artefatos/*.joblib
+ml/artefatos/*.npz
 
 # dataset (baixado a parte, grande demais para o repo)
 BooksDataset.csv
@@ -17,6 +24,7 @@ BooksDataset.csv.zip
 # ide
 .vscode/*
 !.vscode/settings.json
+!.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
