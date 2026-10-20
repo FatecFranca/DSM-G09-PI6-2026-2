@@ -28,3 +28,8 @@ BooksDataset.csv.zip
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+
+# configurações locais com credenciais
+src/Livros.Api/appsettings.Development.json
+src/Livros.Api/appsettings.Local.json
+cloud/.env
