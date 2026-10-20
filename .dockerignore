@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/.git/
+**/.env
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/node_modules/
+**/__pycache__/
+BooksDataset.csv
+BooksDataset.csv.zip
+ml/artefatos/
+*.backup
