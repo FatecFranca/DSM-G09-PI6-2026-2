@@ -51,9 +51,12 @@ construtor.Services.AddAuthentication(CookieAuthenticationDefaults.Authenticatio
     {
         opcoes.Cookie.Name = "nextread.session";
         opcoes.Cookie.HttpOnly = true;
-        opcoes.Cookie.SameSite = SameSiteMode.Lax;
+        opcoes.Cookie.SameSite = construtor.Environment.IsDevelopment()
+            ? SameSiteMode.Lax
+            : SameSiteMode.None;
         opcoes.Cookie.SecurePolicy = construtor.Environment.IsDevelopment()
-            ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+            ? CookieSecurePolicy.SameAsRequest
+            : CookieSecurePolicy.Always;
         opcoes.ExpireTimeSpan = TimeSpan.FromHours(8);
         opcoes.SlidingExpiration = false;
         opcoes.Events.OnRedirectToLogin = contexto =>
