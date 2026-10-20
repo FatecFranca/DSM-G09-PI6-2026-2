@@ -1,7 +1,10 @@
 "use strict";
 
-// Servidor local. Em producao, a Etapa 10 configurara a URL por ambiente.
-const API_BASE = "http://localhost:5267";
+const API_BASE =
+    ["localhost", "127.0.0.1"].includes(window.location.hostname)
+        ? "http://localhost:5267"
+        : "https://dsm-g09-pi6-2026-2.onrender.com";
+
 const TAMANHO_PAGINA = 12;
 let promessaUsuario = null;
 
