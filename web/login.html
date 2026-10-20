@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar ou cadastrar | NextRead</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="header">
+    <a href="index.html" class="logo">NextRead</a>
+    <nav class="menu">
+        <a href="index.html">Início</a>
+        <a href="pesquisa.html">Explorar</a>
+        <a href="salvos.html">Meus Livros</a>
+        <a href="recomendacoes.html">Recomendações</a>
+    </nav>
+    <a href="login.html" class="btn-login">Entrar</a>
+</header>
+<main class="auth-pagina">
+    <section class="auth-caixa" id="autenticacao" aria-label="Acesso à conta NextRead">
+        <span class="subtitulo">Sua biblioteca NextRead</span>
+        <h1>Boas-vindas!</h1>
+        <p>Entre na sua conta ou faça seu cadastro para salvar seus livros favoritos.</p>
+        <div class="auth-abas" role="tablist" aria-label="Escolher forma de acesso">
+            <button type="button" data-aba-auth="entrar" role="tab" aria-selected="true">Entrar</button>
+            <button type="button" data-aba-auth="cadastro" role="tab" aria-selected="false">Criar conta</button>
+        </div>
+        <form id="form-entrar" class="auth-form">
+            <label for="email-entrar">E-mail</label>
+            <input id="email-entrar" type="email" name="email" autocomplete="username" maxlength="255" required>
+            <label for="senha-entrar">Senha</label>
+            <input id="senha-entrar" type="password" name="senha" autocomplete="current-password" required>
+            <button class="btn-principal" type="submit">Entrar</button>
+        </form>
+        <form id="form-cadastro" class="auth-form" hidden>
+            <label for="nome-cadastro">Nome completo</label>
+            <input id="nome-cadastro" name="nome" autocomplete="name" minlength="2" maxlength="150" required>
+            <label for="email-cadastro">E-mail</label>
+            <input id="email-cadastro" type="email" name="email" autocomplete="email" maxlength="255" required>
+            <label for="senha-cadastro">Senha (mínimo de 8 caracteres)</label>
+            <input id="senha-cadastro" type="password" name="senha" autocomplete="new-password" minlength="8" maxlength="100" required>
+            <label for="confirma-cadastro">Confirme a senha</label>
+            <input id="confirma-cadastro" type="password" name="confirmar_senha" autocomplete="new-password" minlength="8" maxlength="100" required>
+            <button class="btn-principal" type="submit">Criar conta</button>
+        </form>
+        <p id="mensagem-auth" class="mensagem-api" role="status" aria-live="polite"></p>
+    </section>
+</main>
+<footer class="footer">
+    <strong>NextRead</strong>
+    <p>Projeto Integrador — DSM 6º Semestre — FATEC Franca</p>
+</footer>
+<script src="Javascript/script.js" defer></script>
+</body>
+</html>

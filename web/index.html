@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookMatch</title>
+    <title>NextRead</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
 <header class="header">
-    <a href="index.html" class="logo">BookMatch</a>
+    <a href="index.html" class="logo">NextRead</a>
 
     <nav class="menu">
         <a href="index.html">Início</a>
@@ -59,78 +59,25 @@
         <div class="secao-cabecalho">
             <div>
                 <span class="subtitulo">Explore</span>
-                <h2>Livros em destaque</h2>
+                <h2>Livros do catálogo</h2>
             </div>
 
             <a href="pesquisa.html">Ver todos →</a>
         </div>
 
-        <div class="livros-grid">
-
-            <article class="livro-card">
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-                    <span class="categoria">Ficção</span>
-                    <h3>Nome do Livro</h3>
-                    <p>Nome do Autor</p>
-                    <a href="livro.html">Ver detalhes</a>
-                </div>
-            </article>
-
-            <article class="livro-card">
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-                    <span class="categoria">Fantasia</span>
-                    <h3>Outra História</h3>
-                    <p>Nome do Autor</p>
-                    <a href="livro.html">Ver detalhes</a>
-                </div>
-            </article>
-
-            <article class="livro-card">
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-                    <span class="categoria">Literatura</span>
-                    <h3>Livro Recomendado</h3>
-                    <p>Nome do Autor</p>
-                    <a href="livro.html">Ver detalhes</a>
-                </div>
-            </article>
-
-            <article class="livro-card">
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-                    <span class="categoria">Aventura</span>
-                    <h3>Nova Leitura</h3>
-                    <p>Nome do Autor</p>
-                    <a href="livro.html">Ver detalhes</a>
-                </div>
-            </article>
-
-        </div>
+        <p id="mensagem-destaques" role="status" aria-live="polite">Carregando livros do catálogo...</p>
+        <div id="lista-destaques" class="livros-grid"></div>
 
     </section>
 
 </main>
 
 <footer class="footer">
-    <strong>BookMatch</strong>
+    <strong>NextRead</strong>
     <p>Projeto Integrador — DSM 6º Semestre — FATEC Franca</p>
 </footer>
 
-<script src="js/script.js"></script>
+<script src="Javascript/script.js"></script>
 
 </body>
 </html>

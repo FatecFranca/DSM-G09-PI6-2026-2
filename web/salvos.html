@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Meus Livros | BookMatch</title>
+    <title>Meus Livros | NextRead</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -12,7 +12,7 @@
 <body>
 
 <header class="header">
-    <a href="index.html" class="logo">BookMatch</a>
+    <a href="index.html" class="logo">NextRead</a>
 
     <nav class="menu">
         <a href="index.html">Início</a>
@@ -49,14 +49,14 @@
             <div class="resumo-biblioteca">
 
                 <div class="resumo-item">
-                    <strong>4</strong>
+                    <strong id="total-salvos">0</strong>
                     <span>Livros salvos</span>
                 </div>
 
                 <div class="resumo-divisor"></div>
 
                 <div class="resumo-item">
-                    <strong>4</strong>
+                    <strong id="total-categorias-salvas">0</strong>
                     <span>Categorias</span>
                 </div>
 
@@ -93,11 +93,12 @@
 
                 <input
                     type="search"
+                    id="busca-salvos"
                     placeholder="Pesquisar nos salvos..."
                     aria-label="Pesquisar nos livros salvos"
                 >
 
-                <select aria-label="Ordenar livros salvos">
+                <select id="ordenacao-salvos" aria-label="Ordenar livros salvos">
                     <option>Mais recentes</option>
                     <option>Mais antigos</option>
                     <option>Título A-Z</option>
@@ -109,205 +110,8 @@
         </div>
 
 
-        <div class="livros-grid">
-
-            <!-- LIVRO 1 -->
-            <article class="livro-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <button
-                        class="btn-remover-salvo"
-                        type="button"
-                        title="Remover dos salvos"
-                        aria-label="Remover livro dos salvos"
-                    >
-                        ♥
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Ficção
-                    </span>
-
-                    <h3>
-                        Nome do Livro
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <div class="card-acoes">
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                        <button type="button">
-                            Remover
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 2 -->
-            <article class="livro-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <button
-                        class="btn-remover-salvo"
-                        type="button"
-                        title="Remover dos salvos"
-                        aria-label="Remover livro dos salvos"
-                    >
-                        ♥
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Fantasia
-                    </span>
-
-                    <h3>
-                        Outra História
-                    </h3>
-
-                    <p>
-                        Outro Autor
-                    </p>
-
-                    <div class="card-acoes">
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                        <button type="button">
-                            Remover
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 3 -->
-            <article class="livro-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <button
-                        class="btn-remover-salvo"
-                        type="button"
-                        title="Remover dos salvos"
-                        aria-label="Remover livro dos salvos"
-                    >
-                        ♥
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Literatura
-                    </span>
-
-                    <h3>
-                        Livro Recomendado
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <div class="card-acoes">
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                        <button type="button">
-                            Remover
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 4 -->
-            <article class="livro-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <button
-                        class="btn-remover-salvo"
-                        type="button"
-                        title="Remover dos salvos"
-                        aria-label="Remover livro dos salvos"
-                    >
-                        ♥
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Aventura
-                    </span>
-
-                    <h3>
-                        Nova Leitura
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <div class="card-acoes">
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                        <button type="button">
-                            Remover
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-        </div>
-
+        <p id="mensagem-salvos" role="status" aria-live="polite">Verificando sessão...</p>
+        <div class="livros-grid" id="lista-salvos"></div>
 
         <!-- BLOCO FINAL -->
         <div class="salvos-explorar">
@@ -343,7 +147,7 @@
 <footer class="footer">
 
     <strong>
-        BookMatch
+        NextRead
     </strong>
 
     <p>
@@ -352,7 +156,7 @@
 
 </footer>
 
-<script src="js/script.js"></script>
+<script src="Javascript/script.js"></script>
 
 </body>
 </html>
