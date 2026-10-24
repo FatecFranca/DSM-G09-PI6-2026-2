@@ -127,4 +127,4 @@ continua sendo executado separadamente (veja `ml/README.md`).
 
 Guia de validação e testes: [`docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md`](docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md).
 
-Link do Site: [NextRead](https://nextread-frontend.onrender.com/index.html)
+### Link do Site: [NextRead](https://nextread-frontend.onrender.com/index.html)
