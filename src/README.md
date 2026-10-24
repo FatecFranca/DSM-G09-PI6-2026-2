@@ -59,8 +59,8 @@ as chamadas de `ExcludeFromMigrations()` nas configurações em `Livros.Dados/Co
 
 ## Como rodar
 
-Ajuste a connection string em `Livros.Api/appsettings.json`, ou sobrescreva por variável
-de ambiente (útil no deploy, e evita commitar senha):
+Configure a connection string usando variável de ambiente ou o arquivo local **não versionado** `appsettings.Development.json`:
+
 
 ```bash
 set ConnectionStrings__BancoLivros=Host=localhost;Port=5432;Database=livros_pi;Username=postgres;Password=SUA_SENHA
@@ -88,13 +88,27 @@ Swagger em `http://localhost:<porta>/swagger`. A porta aparece no console.
 | GET | `/livros/{idLivro}` | detalhe do livro |
 | GET | `/livros/{idLivro}/recomendacoes` | similares; `total` (1–50) |
 | GET | `/categorias` | categorias atômicas com contagem |
-| GET | `/usuarios` | lista paginada; `pagina`, `tamanhoPagina`, `busca` |
+| GET | `/usuarios` | lista paginada — acesso reservado a administradores (papel ainda não concedido) |
 | POST | `/usuarios` | cria usuário |
 | GET | `/usuarios/{idUsuario}` | detalhe |
 | PUT | `/usuarios/{idUsuario}` | atualiza nome e email |
 | PUT | `/usuarios/{idUsuario}/senha` | troca a senha (exige a atual) |
 | DELETE | `/usuarios/{idUsuario}` | remove |
 | GET | `/saude` | estado do banco e se a similaridade já foi calculada |
+
+Os endpoints `GET/PUT/DELETE /usuarios/{id}` e `PUT /usuarios/{id}/senha` exigem sessão do titular. `POST /usuarios` continua disponível para compatibilidade com o CRUD e criação de contas, mas **prefira `POST /auth/cadastro`**, que também inicia a sessão. A lista completa de contas não é acessível aos usuários comuns.
+
+### Autenticação (Etapa 9)
+
+| Método | Rota | Acesso |
+|---|---|---|
+| POST | `/auth/cadastro` | público; cadastra e cria sessão |
+| POST | `/auth/entrar` | público; verifica senha e cria sessão |
+| GET | `/auth/me` | autenticado; perfil próprio |
+| POST | `/auth/sair` | autenticado; encerra sessão |
+| GET/POST/DELETE | `/usuarios/{idUsuario}/livros-salvos[/{idLivro}]` | somente titular autenticado |
+
+Para alterações (POST/PUT/PATCH/DELETE), enviar header `X-NextRead-Request: 1`. O front usa cookie `HttpOnly` e `credentials: 'include'`. Consulte [`../docs/sprint2/ETAPA9_AUTENTICACAO.md`](../docs/sprint2/ETAPA9_AUTENTICACAO.md).
 
 O `senha_hash` nunca sai da API — o `UsuarioDto` não tem esse campo.
 
