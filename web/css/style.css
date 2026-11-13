@@ -1698,3 +1698,29 @@ select {
     }
 
 }
+/* Integração com API — mantém os componentes visuais já existentes */
+.imagem-capa-api { width: 100%; height: 100%; object-fit: cover; }
+.mensagem-api { margin: 18px 0; color: var(--texto-secundario); line-height: 1.6; }
+.paginacao-api { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 32px; }
+.paginacao-api button { background: var(--destaque); color: white; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+.paginacao-api button:disabled { opacity: .45; cursor: not-allowed; }
+[hidden] { display: none !important; }
+
+/* Etapa 9 — autenticacao integrada ao design existente */
+.botao-sair { border:0; cursor:pointer; font-size:14px; }
+.auth-pagina { min-height: min(80vh, 780px); display:grid; place-items:center; padding:48px 6%; }
+.auth-caixa { width:100%; max-width:470px; padding:36px; border-radius:16px; background:var(--branco); border:1px solid var(--borda); box-shadow:0 16px 40px rgba(0,0,0,.06); }
+.auth-caixa h1 { margin:12px 0; font-size:32px; color:var(--texto); }
+.auth-caixa > p { color:var(--texto-secundario); line-height:1.55; }
+.auth-abas { display:flex; gap:8px; margin:26px 0 20px; }
+.auth-abas button { flex:1; border:1px solid var(--borda); border-radius:8px; background:var(--fundo); padding:12px; cursor:pointer; font-weight:700; }
+.auth-abas button.selecionado { color:var(--destaque); background:var(--destaque-claro); border-color:var(--destaque); }
+.auth-form { display:grid; gap:10px; }
+.auth-form label { margin-top:6px; font-weight:600; font-size:14px; }
+.auth-form input { width:100%; padding:13px; border:1px solid var(--borda); border-radius:8px; background:white; color:var(--texto); font-size:16px; }
+.auth-form input:focus { outline:2px solid var(--destaque); outline-offset:1px; }
+.auth-form button { margin-top:14px; }
+.auth-form button:disabled, .botao-sair:disabled { opacity:.6; cursor:wait; }
+#mensagem-auth { min-height:24px; margin:14px 0 0; }
+#mensagem-salvos { margin:20px 0; }
+@media (max-width:560px) { .auth-caixa { padding:26px 20px; } }

@@ -126,3 +126,5 @@ outros livros da mesma categoria; não há pontuação TF-IDF nesse modo. O trei
 continua sendo executado separadamente (veja `ml/README.md`).
 
 Guia de validação e testes: [`docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md`](docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md).
+
+### Link do Site: [NextRead](https://nextread-frontend.onrender.com/index.html)

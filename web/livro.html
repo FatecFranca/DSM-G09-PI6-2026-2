@@ -12,7 +12,7 @@
 <body>
 
 <header class="header">
-    <a href="index.html" class="logo">BookMatch</a>
+    <a href="index.html" class="logo">NextRead</a>
 
     <nav class="menu">
         <a href="index.html">Início</a>
@@ -32,23 +32,24 @@
             ← Voltar para explorar
         </a>
 
-        <div class="detalhes-grid">
+        <p id="mensagem-livro" class="mensagem-api" role="status" aria-live="polite">Carregando detalhes...</p>
+        <div class="detalhes-grid" id="detalhes-livro" hidden>
 
-            <div class="detalhes-capa">
+            <div class="detalhes-capa" id="capa-detalhe">
                 <span>BOOK</span>
             </div>
 
             <div class="detalhes-conteudo">
 
-                <span class="categoria">
+                <span class="categoria" id="categoria-detalhe">
                     Ficção
                 </span>
 
-                <h1>
+                <h1 id="titulo-detalhe">
                     Nome do Livro
                 </h1>
 
-                <p class="detalhes-autor">
+                <p class="detalhes-autor" id="autor-detalhe">
                     por Nome do Autor
                 </p>
 
@@ -56,28 +57,28 @@
 
                     <div>
                         <span>Editora</span>
-                        <strong>Editora Exemplo</strong>
+                        <strong id="editora-detalhe">—</strong>
                     </div>
 
                     <div>
                         <span>Publicação</span>
-                        <strong>Janeiro de 2001</strong>
+                        <strong id="publicacao-detalhe">—</strong>
                     </div>
 
                     <div>
                         <span>Preço inicial</span>
-                        <strong>US$ 8,79</strong>
+                        <strong id="preco-detalhe">—</strong>
                     </div>
 
                 </div>
 
                 <div class="detalhes-acoes">
 
-                    <button class="btn-salvar-livro" type="button">
+                    <button class="btn-salvar-livro" type="button" id="botao-salvar-detalhe" disabled title="Selecione um usuário de teste em Meus Livros">
                         ♡ Salvar livro
                     </button>
 
-                    <a href="recomendacoes.html" class="btn-secundario">
+                    <a href="recomendacoes.html" class="btn-secundario" id="link-semelhantes">
                         Ver semelhantes
                     </a>
 
@@ -102,129 +103,13 @@
                 Descrição
             </h2>
 
-            <p>
-                Esta área exibirá a descrição completa do livro.
-                Na versão integrada do sistema, o conteúdo será carregado
-                diretamente da API com base no livro selecionado pelo usuário.
-            </p>
+            <p id="descricao-detalhe">Carregando descrição...</p>
 
         </div>
 
     </section>
 
 
-    <section class="secao">
-
-        <div class="secao-cabecalho">
-
-            <div>
-                <span class="subtitulo">
-                    Você também pode gostar
-                </span>
-
-                <h2>
-                    Livros semelhantes
-                </h2>
-            </div>
-
-            <a href="recomendacoes.html">
-                Ver mais →
-            </a>
-
-        </div>
-
-
-        <div class="livros-grid">
-
-            <article class="livro-card">
-
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Ficção
-                    </span>
-
-                    <h3>
-                        Livro Semelhante
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="livro-card">
-
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Literatura
-                    </span>
-
-                    <h3>
-                        Outra Recomendação
-                    </h3>
-
-                    <p>
-                        Outro Autor
-                    </p>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="livro-card">
-
-                <div class="livro-capa">
-                    <span>BOOK</span>
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Romance
-                    </span>
-
-                    <h3>
-                        Nova História
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-        </div>
-
-    </section>
 
 </main>
 
@@ -232,7 +117,7 @@
 <footer class="footer">
 
     <strong>
-        BookMatch
+        NextRead
     </strong>
 
     <p>
@@ -241,7 +126,7 @@
 
 </footer>
 
-<script src="js/script.js"></script>
 
+<script src="Javascript/script.js" defer></script>
 </body>
 </html>

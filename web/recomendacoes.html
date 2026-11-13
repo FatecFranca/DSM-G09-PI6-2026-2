@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Recomendações | BookMatch</title>
+    <title>Recomendações | NextRead</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -14,7 +14,7 @@
 <header class="header">
 
     <a href="index.html" class="logo">
-        BookMatch
+        NextRead
     </a>
 
     <nav class="menu">
@@ -50,9 +50,7 @@
             </h1>
 
             <p>
-                O BookMatch usa seus interesses e os livros que você
-                explora para encontrar novas leituras que podem fazer
-                parte da sua próxima descoberta.
+                O NextRead encontra livros semelhantes aos que você salvou na biblioteca. Você também pode pedir sugestões a partir de um título do catálogo.
             </p>
 
             <a href="#recomendacoes" class="btn-principal">
@@ -64,301 +62,26 @@
     </section>
 
 
-    <!-- RECOMENDAÇÃO PRINCIPAL -->
-    <section class="recomendacao-destaque">
-
-        <div class="recomendacao-destaque-capa">
-            <span>BOOK</span>
-        </div>
-
-
-        <div class="recomendacao-destaque-info">
-
-            <span class="subtitulo">
-                Recomendação em destaque
-            </span>
-
-            <span class="compatibilidade">
-                94% compatível
-            </span>
-
-            <h2>
-                Uma História Feita Para Você
-            </h2>
-
-            <p class="recomendacao-autor">
-                Nome do Autor
-            </p>
-
-            <p class="recomendacao-descricao">
-                Uma narrativa envolvente selecionada com base nos seus
-                interesses recentes e nas categorias que você mais explorou.
-            </p>
-
-
-            <div class="porque-recomendamos">
-
-                <p>
-                    Por que recomendamos?
-                </p>
-
-                <div class="motivos-recomendacao">
-
-                    <span>Ficção</span>
-                    <span>Aventura</span>
-                    <span>Interesses recentes</span>
-
-                </div>
-
-            </div>
-
-
-            <div class="recomendacao-acoes">
-
-                <a href="livro.html" class="btn-principal">
-                    Ver detalhes
-                </a>
-
-                <button type="button" class="btn-salvar-recomendacao">
-                    ♡ Salvar
-                </button>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- LISTA PERSONALIZADA -->
+    <!-- Recomendações obtidas da API para um livro do catálogo. -->
     <section class="secao" id="recomendacoes">
-
         <div class="secao-cabecalho">
-
             <div>
-
-                <span class="subtitulo">
-                    Para você
-                </span>
-
-                <h2>
-                    Recomendações personalizadas
-                </h2>
-
+                <span class="subtitulo">Descobertas relacionadas</span>
+                <h2>Livros semelhantes</h2>
+                <p id="livro-referencia" aria-live="polite">Verificando seus livros salvos para encontrar sugestões relevantes...</p>
             </div>
-
-            <a href="pesquisa.html">
-                Explorar catálogo →
-            </a>
-
+            <a href="pesquisa.html">Explorar catálogo →</a>
         </div>
-
-
-        <div class="livros-grid">
-
-            <!-- LIVRO 1 -->
-            <article class="livro-card recomendacao-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <span class="match-badge">
-                        91%
-                    </span>
-
-                    <button
-                        class="btn-salvar-recomendacao-card"
-                        type="button"
-                        aria-label="Salvar livro"
-                    >
-                        ♡
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Ficção
-                    </span>
-
-                    <h3>
-                        O Último Horizonte
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <span class="recomendado-por">
-                        Baseado em Ficção e Aventura
-                    </span>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 2 -->
-            <article class="livro-card recomendacao-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <span class="match-badge">
-                        88%
-                    </span>
-
-                    <button
-                        class="btn-salvar-recomendacao-card"
-                        type="button"
-                        aria-label="Salvar livro"
-                    >
-                        ♡
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Fantasia
-                    </span>
-
-                    <h3>
-                        Além das Montanhas
-                    </h3>
-
-                    <p>
-                        Outro Autor
-                    </p>
-
-                    <span class="recomendado-por">
-                        Similar aos livros que você explorou
-                    </span>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 3 -->
-            <article class="livro-card recomendacao-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <span class="match-badge">
-                        85%
-                    </span>
-
-                    <button
-                        class="btn-salvar-recomendacao-card"
-                        type="button"
-                        aria-label="Salvar livro"
-                    >
-                        ♡
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Literatura
-                    </span>
-
-                    <h3>
-                        Histórias do Tempo
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <span class="recomendado-por">
-                        Relacionado aos seus livros salvos
-                    </span>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <!-- LIVRO 4 -->
-            <article class="livro-card recomendacao-card">
-
-                <div class="livro-capa">
-
-                    <span>BOOK</span>
-
-                    <span class="match-badge">
-                        82%
-                    </span>
-
-                    <button
-                        class="btn-salvar-recomendacao-card"
-                        type="button"
-                        aria-label="Salvar livro"
-                    >
-                        ♡
-                    </button>
-
-                </div>
-
-                <div class="livro-info">
-
-                    <span class="categoria">
-                        Aventura
-                    </span>
-
-                    <h3>
-                        Caminhos Desconhecidos
-                    </h3>
-
-                    <p>
-                        Nome do Autor
-                    </p>
-
-                    <span class="recomendado-por">
-                        Categoria que você costuma explorar
-                    </span>
-
-                    <a href="livro.html">
-                        Ver detalhes
-                    </a>
-
-                </div>
-
-            </article>
-
-        </div>
-
+        <p id="mensagem-recomendacoes" role="status" aria-live="polite">Carregando recomendações...</p>
+        <div id="lista-recomendacoes" class="livros-grid"></div>
     </section>
 
-
-    <!-- EXPLICAÇÃO -->
     <section class="como-funciona-recomendacao">
 
         <div class="como-funciona-texto">
 
             <span class="subtitulo">
-                BookMatch
+                NextRead
             </span>
 
             <h2>
@@ -367,9 +90,8 @@
 
             <p>
                 As recomendações consideram características dos livros
-                e os interesses demonstrados durante sua navegação.
-                Quanto mais você explora e salva títulos, mais informações
-                o sistema pode utilizar para melhorar suas sugestões.
+                de cada título salvo no seu perfil. Se o modelo de similaridade
+                ainda não foi treinado, buscamos outros livros da mesma categoria.
             </p>
 
         </div>
@@ -410,9 +132,9 @@
                 <span>03</span>
 
                 <div>
-                    <strong>BookMatch recomenda</strong>
+                    <strong>NextRead recomenda</strong>
                     <p>
-                        O sistema encontra livros relacionados aos seus interesses.
+                        O sistema busca livros semelhantes aos títulos salvos usando o modelo de conteúdo ou, se necessário, a categoria.
                     </p>
                 </div>
 
@@ -428,7 +150,7 @@
 <footer class="footer">
 
     <strong>
-        BookMatch
+        NextRead
     </strong>
 
     <p>
@@ -438,7 +160,7 @@
 </footer>
 
 
-<script src="js/script.js"></script>
+<script src="Javascript/script.js"></script>
 
 </body>
 </html>

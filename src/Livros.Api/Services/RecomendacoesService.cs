@@ -1,6 +1,7 @@
 using Livros.Dados;
 using Livros.Dominio.Entidades;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Livros.Api.Services;
 
@@ -19,10 +20,17 @@ public class RecomendacoesService(ContextoLivros contexto)
         int total,
         CancellationToken cancelamento)
     {
-        var daTabela = await BuscarNaTabelaAsync(livro.IdLivro, total, cancelamento);
-        if (daTabela.Count > 0)
+        // A tabela de similaridades e criada pela migration e preenchida pelo ML.
+        // Enquanto nao existir, mantemos recomendacoes por categoria em vez de HTTP 500.
+        try
         {
-            return (OrigemDaRecomendacao.Tabela, daTabela);
+            var daTabela = await BuscarNaTabelaAsync(livro.IdLivro, total, cancelamento);
+            if (daTabela.Count > 0)
+                return (OrigemDaRecomendacao.Tabela, daTabela);
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UndefinedTable)
+        {
+            // Banco ainda sem a migration livros_similares: usar o catalogo comum.
         }
 
         return (OrigemDaRecomendacao.Categoria, await BuscarPorCategoriaAsync(livro, total, cancelamento));

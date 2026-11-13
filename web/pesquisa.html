@@ -14,7 +14,7 @@
 <header class="header">
 
     <a href="index.html" class="logo">
-        BookMatch
+        NextRead
     </a>
 
     <nav class="menu">
@@ -50,14 +50,17 @@
             </p>
 
 
-            <form class="barra-pesquisa">
+            <form class="barra-pesquisa" id="form-pesquisa">
 
                 <input
                     type="text"
+                    id="busca"
+                    name="busca"
+                    aria-label="Buscar por título ou autor"
                     placeholder="Pesquisar livros..."
                 >
 
-                <button type="button">
+                <button type="submit">
                     Pesquisar
                 </button>
 
@@ -81,71 +84,14 @@
                     Categoria
                 </label>
 
-                <select id="categoria">
-
-                    <option>
-                        Todas
-                    </option>
-
-                    <option>
-                        Ficção
-                    </option>
-
-                    <option>
-                        Fantasia
-                    </option>
-
-                    <option>
-                        História
-                    </option>
-
-                    <option>
-                        Romance
-                    </option>
-
-                    <option>
-                        Tecnologia
-                    </option>
-
+                <select id="categoria" aria-label="Filtrar por categoria">
+                    <option value="">Todas</option>
                 </select>
 
             </div>
 
 
-            <div class="grupo-filtro">
-
-                <label for="ano">
-                    Ano de publicação
-                </label>
-
-                <select id="ano">
-
-                    <option>
-                        Todos
-                    </option>
-
-                    <option>
-                        2000 - atual
-                    </option>
-
-                    <option>
-                        1990 - 1999
-                    </option>
-
-                    <option>
-                        1980 - 1989
-                    </option>
-
-                    <option>
-                        Antes de 1980
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <button class="btn-filtro">
+            <button class="btn-filtro" id="aplicar-filtros" type="button">
                 Aplicar filtros
             </button>
 
@@ -169,189 +115,19 @@
                 </div>
 
                 <span class="quantidade-resultados">
-                    103.063 livros disponíveis
+                    Carregando livros...
                 </span>
 
             </div>
 
 
-            <div class="livros-grid">
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            Ficção
-                        </span>
-
-                        <h3>
-                            Nome do Livro
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            Fantasia
-                        </span>
-
-                        <h3>
-                            Outra História
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            Literatura
-                        </span>
-
-                        <h3>
-                            Livro Recomendado
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            História
-                        </span>
-
-                        <h3>
-                            Uma Nova Leitura
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            Tecnologia
-                        </span>
-
-                        <h3>
-                            Livro de Tecnologia
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-
-                <article class="livro-card">
-
-                    <div class="livro-capa">
-                        <span>BOOK</span>
-                    </div>
-
-                    <div class="livro-info">
-
-                        <span class="categoria">
-                            Romance
-                        </span>
-
-                        <h3>
-                            Uma História de Amor
-                        </h3>
-
-                        <p>
-                            Nome do Autor
-                        </p>
-
-                        <a href="livro.html">
-                            Ver detalhes
-                        </a>
-
-                    </div>
-
-                </article>
-
-            </div>
+            <p id="mensagem-resultados" class="mensagem-api" role="status" aria-live="polite">Carregando catálogo...</p>
+            <div class="livros-grid" id="lista-livros"></div>
+            <nav class="paginacao-api" aria-label="Paginação dos livros">
+                <button type="button" id="pagina-anterior" disabled>Anterior</button>
+                <span id="pagina-atual">Página 1</span>
+                <button type="button" id="pagina-proxima" disabled>Próxima</button>
+            </nav>
 
         </section>
 
@@ -363,7 +139,7 @@
 <footer class="footer">
 
     <strong>
-        BookMatch
+        NextRead
     </strong>
 
     <p>
@@ -372,5 +148,6 @@
 
 </footer>
 
+<script src="Javascript/script.js" defer></script>
 </body>
 </html>
