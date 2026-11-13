@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "NextRead", "slug": "nextread-mobile", "version": "1.0.0",
+    "orientation": "portrait", "userInterfaceStyle": "light",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "br.edu.fatecfranca.nextread" },
+    "android": { "package": "br.edu.fatecfranca.nextread" },
+    "scheme": "nextread"
+  }
+}
