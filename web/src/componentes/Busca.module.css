@@ -1,0 +1,16 @@
+.busca {
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+}
+
+.campo {
+  min-height: 46px;
+  border-right: 0;
+  border-radius: var(--raio) 0 0 var(--raio);
+}
+
+.botao {
+  min-height: 46px;
+  border-radius: 0 var(--raio) var(--raio) 0;
+}

@@ -1,128 +1,164 @@
-# DSM-G09-PI6-2026-2
+# NextRead
 
-Repositório do GRUPO 09 do Projeto Interdisciplinar do 6º semestre DSM 2026/2.
+Projeto Interdisciplinar do 6º semestre de DSM (Fatec Franca, 2026/2), grupo 09.
 
-**Alunos:** Hudson Ribeiro, Maria Clara, Gustavo Schizzari e Eduardo Gibertoni
+**Integrantes:** Hudson Ribeiro, Maria Clara, Gustavo Schizzari e Eduardo Gibertoni
+
+**Site:** [nextread-frontend.onrender.com](https://nextread-frontend.onrender.com/)
 
 ## O projeto
 
-Sistema de recomendação de livros baseado em conteúdo. O dataset não traz avaliação de
-usuário, então a recomendação vem dos metadados do próprio livro — título, categoria,
-autores e descrição — via TF-IDF e similaridade de cosseno.
+O NextRead recomenda livros pelo conteúdo. O dataset (cerca de 99 mil livros) não traz avaliações
+de usuários, então a recomendação vem dos metadados do próprio livro: título, categoria, autores e
+descrição, comparados por TF-IDF e similaridade de cosseno.
 
-A aplicação também conta com uma interface web para exploração do catálogo, visualização
-dos detalhes dos livros, gerenciamento de livros salvos e apresentação de recomendações
-por similaridade de conteúdo.
+- **Catálogo:** busca, filtro por categoria e página de cada livro.
+- **Biblioteca:** cada pessoa salva os livros que quer ler (sessão por cookie).
+- **Parecidos com este livro:** os 10 vizinhos mais próximos de cada livro, calculados pelo pipeline
+  de mineração de dados.
+- **Para você:** a pessoa dá notas de 1 a 5 estrelas e recebe uma lista individual, com o motivo de
+  cada sugestão ("Porque você deu 5★ a …").
+- **Mineração de dados:** classificação de gênero (supervisionado) e clusterização (não
+  supervisionado), documentadas pelas fases do CRISP-DM.
+- **Mensageria:** as interações (visualizar, salvar, remover) passam por uma fila do Azure Service
+  Bus até um consumidor em Python.
+
+## Arquitetura
+
+```
+                                      BooksDataset.csv
+                                             │
+                                             ▼
+                               ml/ (limpeza, TF-IDF, cosseno)
+                                             │ livros, livros_similares
+                                             ▼
+web/, mobile/ ──HTTP──► API C# (src/) ◄──► PostgreSQL
+                              │                  ▲
+                              │ eventos          │ interacoes
+                              ▼                  │
+                     Azure Service Bus ──► mensageria/ (Python)
+```
+
+O Python e a API não conversam por HTTP. O pipeline grava os vizinhos de cada livro na tabela
+`livros_similares` e a API só lê dali. A API publica os eventos na fila, e o consumidor os grava em
+`interacoes`.
 
 ## Organização
 
-| Pasta | Responsável | O que tem |
+| Pasta | O que tem | Documentação |
 |---|---|---|
-| `src/` | back-end | API em C# / ASP.NET Core com EF Core |
-| `ml/` | back-end | Pipeline Python: ingestão do dataset e modelo de recomendação |
-| `web/` | front-end | Interface HTML/CSS/JS integrada à API nas páginas de pesquisa, detalhes, recomendações, salvos e autenticação |
+| `src/` e `web/` | API em ASP.NET Core 10 e site em React + Vite + TypeScript | [`src/README.md`](src/README.md) |
+| `ml/` | ingestão do dataset, recomendador e mineração de dados (CRISP-DM) | [`ml/README.md`](ml/README.md) |
+| `mobile/` | aplicativo em Expo + React Native | [`mobile/README.md`](mobile/README.md) |
+| `mensageria/` e `cloud/` | consumidor do Azure Service Bus e implantação em nuvem | [`mensageria/README.md`](mensageria/README.md) |
+| `database/` | scripts SQL das tabelas | seção [Banco de dados](#2-banco-de-dados) abaixo |
+| `tests/` | testes da API (xUnit) e smoke test HTTP | seção [Testes](#testes) abaixo |
 
-O back-end é poliglota de propósito: a API é C# (tipagem em tempo de compilação e
-migrations do EF Core) e a mineração de dados é Python (pandas e scikit-learn).
-Os dois lados não conversam por HTTP — o Python grava o resultado do modelo na tabela
-`livros_similares` e a API lê de lá.
+## Como rodar localmente
 
-O `BooksDataset.csv` fica na raiz, fora do versionamento (descompacte o `.zip` antes de
-rodar a ingestão).
+### 1. Pré-requisitos
 
-## Sprint 1 — entregue
+- .NET SDK 10 e a ferramenta `dotnet-ef` (`dotnet tool install --global dotnet-ef`)
+- PostgreSQL 18
+- Python 3.14
+- Node 24
+- `BooksDataset.csv` na raiz do repositório (fora do Git; descompacte o `.zip`)
 
-- estrutura da API em ASP.NET Core, com Swagger e os endpoints do front
-- CRUD de usuário, com senha guardada em hash (PBKDF2)
-- mapeamento EF Core do schema do banco, mais a tabela `livros_similares`
-- ingestão do `BooksDataset.csv`: limpeza, normalização e carga via `COPY`
-- pipeline de ML: TF-IDF sobre o conteúdo do livro, cosseno em blocos e persistência
-  do top-N para o endpoint não recalcular a cada requisição
-- protótipo inicial do front-end desenvolvido em HTML e CSS
-- identidade visual e layout responsivo inicial da aplicação
-- navegação entre as principais telas do sistema
-- tela inicial com apresentação da plataforma e campo de pesquisa
-- tela de exploração e pesquisa do catálogo
-- tela de detalhes do livro
-- tela de livros salvos do usuário
-- tela de recomendações personalizadas
+As senhas ficam em arquivos locais que não vão para o Git:
 
-### Front-end
+| Arquivo | Para quê | Modelo |
+|---|---|---|
+| `src/Livros.Api/appsettings.Development.json` | conexão da API com o banco e a fila | `appsettings.Development.json.example` |
+| `ml/.env` | `BANCO_URL=postgresql://...` para o Python | `ml/.env.example` |
+| `mensageria/.env` | conexão com a fila e o banco | `mensageria/.env.example` |
+| `web/.env` (opcional) | `VITE_API_URL` para usar outra API | `web/.env.example` |
 
-O protótipo da interface está localizado na pasta `web/`.
+### 2. Banco de dados
 
-Na Sprint 1, as telas eram estáticas e tinham como objetivo definir a estrutura,
-identidade visual e experiência de navegação da aplicação. Na Sprint 2, `pesquisa.html`
-e `livro.html` passaram a consultar a API; as páginas `recomendacoes.html` e `salvos.html` foram conectadas posteriormente, e `login.html` implementa cadastro e entrada por sessão.
+Crie o banco com `CREATE DATABASE livros_pi;` (fora de transação) e execute, conectado a ele
+(pgAdmin ou `psql`):
 
-Principais telas:
+1. `database/01_criar_tabelas.sql`: `usuarios`, `livros`, `livros_salvos` e `interacoes`.
+2. A migration do EF Core, que cria `livros_similares`:
+   ```bash
+   dotnet ef database update --project src/Livros.Dados --startup-project src/Livros.Api
+   ```
+3. `database/04_mensageria.sql`: coluna `id_evento` em `interacoes` (evita gravar a mesma mensagem
+   duas vezes).
+4. `database/05_avaliacoes.sql`: tabela `avaliacoes` (notas de 1 a 5).
+5. `database/03_verificar_banco.sql`: confere as tabelas e a contagem de livros.
 
-- `index.html` — página inicial com livros do catálogo real
-- `pesquisa.html` — exploração e pesquisa de livros
-- `livro.html` — detalhes de um livro
-- `salvos.html` — biblioteca de livros salvos
-- `recomendacoes.html` — recomendações a partir dos livros salvos (ou de um livro selecionado)
-- `login.html` — login e cadastro de usuários
+Todos os scripts podem rodar mais de uma vez sem apagar dados. Os scripts `04` e `05` também precisam
+rodar no banco de produção. `CREATE TABLE IF NOT EXISTS` não atualiza tabelas antigas: em um banco
+antigo, compare as colunas com as entidades em `src/Livros.Dominio`.
 
-## Arquitetura em Nuvem (Planejamento)
+Para uma demonstração rápida sem o dataset, `database/02_dados_teste.sql` insere 12 livros
+fictícios. Não misture com o catálogo real nem rode em produção.
 
-Para atender à arquitetura da aplicação e respeitar os Requisitos Não Funcionais (como performance e sistema modular), a infraestrutura foi desenhada de forma distribuída e assíncrona, utilizando o ecossistema **Google Cloud Platform (GCP)**:
+### 3. Catálogo e recomendações (Python)
 
-- **Front-end:** Google Cloud Storage (Static Website Hosting) ou Firebase Hosting para servir os arquivos estáticos (HTML/CSS/JS) com alta disponibilidade e baixo custo.
-- **Back-end (API C#):** Google Compute Engine (GCE) com instância `e2-micro` para hospedar a API ASP.NET Core, mantendo o controle do ambiente Linux e das dependências.
-- **Banco de Dados:** Google Cloud SQL (PostgreSQL) para garantir a integridade relacional das tabelas de usuários, livros e interações, automatizando rotinas de backup e segurança.
-- **Mineração de Dados e Mensageria (IA):** Arquitetura orientada a eventos usando **Google Cloud Pub/Sub**. As interações dos usuários (ex: salvar um livro) disparam eventos no tópico `aula-pub`. Em segundo plano, o script de Machine Learning atua como *Subscriber*, consumindo as mensagens de forma assíncrona para recalcular recomendações sem bloquear o tempo de resposta da API principal.
+```bash
+cd ml
+python -m venv .venv
+.venv/Scripts/pip install -r requirements-dev.txt
+.venv/Scripts/python -m Scripts.CarregarDataset                  # ~99 mil livros
+.venv/Scripts/python -m Scripts.TreinarRecomendador --persistir  # ~3 min, preenche livros_similares
+```
 
-Instruções de execução:
+Sem o treino, a API recomenda por categoria. Detalhes e a mineração de dados em
+[`ml/README.md`](ml/README.md).
 
-- API C#: [`src/README.md`](src/README.md)
-- Pipeline de ML: [`ml/README.md`](ml/README.md)
+### 4. API
 
+```bash
+dotnet run --project src/Livros.Api --launch-profile http
+```
 
-## Sprint 2 — Preparação do banco de dados
+A API sobe em `http://localhost:5267`, com o Swagger em `/swagger` e a verificação de saúde em
+`/saude`.
 
-Scripts e instruções para criar as tabelas-base, carregar livros fictícios de demonstração e verificar a conexão estão em [`database/README.md`](database/README.md). A tabela de similares continua gerenciada pela migration existente do EF Core.
+### 5. Site
 
+```bash
+cd web
+npm ci
+npm run dev
+```
 
-## Sprint 2 — Computação em Nuvem II (Etapa 3)
+O site abre em `http://localhost:5500`. A porta é fixa porque o CORS de desenvolvimento da API só
+libera a 5500.
 
-Foram adicionados `cloud/Dockerfile`, `cloud/cloudbuild.yaml`, `cloud/deploy.sh` e o guia [`cloud/README.md`](cloud/README.md) para uma implantação inicial com Cloud Run, Cloud SQL e Secret Manager. **Configuração pronta no repositório; implantação real e evidências no GCP pendentes.** Esta implementação adota Cloud Run no lugar do Compute Engine descrito na seção histórica de planejamento acima.
+### 6. Opcionais
 
+- **Consumidor de mensagens:** veja [`mensageria/README.md`](mensageria/README.md). Sem a
+  configuração da fila, a API funciona normalmente e só registra no log que não publicou.
+- **Aplicativo mobile:** veja [`mobile/README.md`](mobile/README.md).
 
-## Sprint 2 — Documentação intermediária (Etapa 4)
+## Testes
 
-O relatório por requisito, o roteiro de validação, os comandos para reproduzir os testes e a checklist de capturas estão em [`docs/sprint2/README.md`](docs/sprint2/README.md). **Não há evidência de deploy real, testes ponta a ponta ou commits individuais embutida nesse material; devem ser registrados pela equipe.**
+| Parte | Comando | O que cobre |
+|---|---|---|
+| API | `dotnet test src/Livros.slnx` | serviços, controllers, "Para você", mensageria (xUnit, banco em memória) |
+| Site | `cd web && npm test` (e `npm run typecheck`, `npm run lint`) | páginas, componentes e cliente da API (Vitest, sem API) |
+| Mineração | `cd ml && .venv/Scripts/python -m pytest` | ingestão, recomendador, classificador e clusterização (sem banco) |
+| Mensageria | `cd mensageria && .venv/Scripts/python -m pytest` | decisões do consumidor (sem Azure nem banco) |
+| Mobile | `cd mobile && npm run typecheck && npm test` | regras e cliente do app |
 
+O smoke test HTTP exige a API e o banco rodando. Use só em banco de desenvolvimento: ele cria e apaga
+duas contas temporárias.
 
-## Sprint 2 — Etapa 9: login e autorização
+```bash
+python tests/smoke/verificar_api.py --base-url http://localhost:5267
+```
 
-O sistema agora possui cadastro e login com hash PBKDF2 por meio do `PasswordHasher<Usuario>` existente,
-**cookie HttpOnly**, autenticação por sessão, logout, controle de acesso à biblioteca e autorização
-para editar/apagar apenas a própria conta. A página `web/login.html` foi implementada, e
-`salvos.html` não usa mais IDs digitados manualmente.
+## Histórico das sprints
 
-Os endpoints disponíveis são `POST /auth/cadastro`, `POST /auth/entrar`,
-`GET /auth/me` e `POST /auth/sair`.
-
-**Para executar:** leia [`docs/sprint2/ETAPA9_AUTENTICACAO.md`](docs/sprint2/ETAPA9_AUTENTICACAO.md).
-O script `tests/smoke/verificar_api.py` foi atualizado para testar sessão,
-separação entre usuários e logout. **Não foi possível executar um build .NET ou uma
-integração PostgreSQL neste ambiente**, portanto a validação final local permanece necessária.
-
-As sessões por cookie são adequadas para o teste local com ambas as aplicações em
-`localhost`. Para implantação pública, é necessário configurar HTTPS, origens CORS, proxy da
-interface e persistência das chaves de proteção de dados entre instâncias.
-
-
-## Sprint 2 — Correção do catálogo e recomendações
-
-A página inicial agora carrega livros reais via `GET /livros`. A página de recomendações
-consulta os livros salvos da sessão autenticada, reúne livros semelhantes sem repetir
-livros já salvos e apresenta a origem das sugestões. Também continua possível acessar
-`recomendacoes.html?id=ID` para comparar um livro específico com títulos semelhantes.
-
-Quando a tabela `livros_similares` ainda não existe ou não foi preenchida, a API usa
-outros livros da mesma categoria; não há pontuação TF-IDF nesse modo. O treino
-continua sendo executado separadamente (veja `ml/README.md`).
-
-Guia de validação e testes: [`docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md`](docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md).
+- **Sprint 1:** API em ASP.NET Core com Swagger e CRUD de usuário (senha em PBKDF2), mapeamento EF
+  Core, ingestão do dataset por `COPY`, recomendador TF-IDF + cosseno com top-N gravado no banco e
+  protótipo do site em HTML/CSS.
+- **Sprint 2:** scripts SQL das tabelas-base, login por cookie `HttpOnly` com acesso só aos próprios
+  dados, biblioteca e recomendações ligadas à API, recomendação por categoria quando o modelo não
+  foi treinado, Dockerfile e planejamento da nuvem, smoke test HTTP e primeira versão do app mobile.
+- **Sprint 3:** site reescrito em React + Vite + TypeScript com a identidade visual nova (os
+  endereços `.html` antigos redirecionam), mensageria com Azure Service Bus, classificação e
+  clusterização no pipeline de mineração e avaliações com a lista "Para você".

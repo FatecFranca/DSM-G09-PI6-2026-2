@@ -1,10 +1,13 @@
-# API — C# / ASP.NET Core
+# API e site web
 
-Back-end HTTP do NextRead. Não contém machine learning: o modelo é treinado pelo
-pipeline em [`../ml`](../ml), que grava o resultado na tabela `livros_similares`.
-A API só lê essa tabela.
+A API em ASP.NET Core (`src/`) e o site em React (`web/`) formam o NextRead que o usuário vê. A API não
+treina nenhum modelo: o pipeline em [`../ml`](../ml/README.md) grava os vizinhos de cada livro em
+`livros_similares`, e a API só lê essa tabela. Como subir tudo do zero está no
+[README principal](../README.md#como-rodar-localmente).
 
-## Stack
+## API
+
+### Stack
 
 | Camada | Tecnologia |
 |---|---|
@@ -14,116 +17,192 @@ A API só lê essa tabela.
 | Nomes de coluna | `EFCore.NamingConventions` (snake_case automático) |
 | Senha | `PasswordHasher<T>` (PBKDF2, do próprio ASP.NET Core) |
 | Banco | PostgreSQL 18 |
+| Testes | xUnit + EF Core InMemory (`tests/Livros.Api.Testes`) |
 
-## Projetos
+### Projetos
 
 ```
 src/
 ├── Livros.Dominio/     entidades puras, sem dependência de EF
 ├── Livros.Dados/       ContextoLivros, configurações de mapeamento, migrations
-└── Livros.Api/         controllers, DTOs, services, Program.cs
+└── Livros.Api/         controllers, DTOs, services, mensageria, Program.cs
 ```
 
 `Livros.Api` referencia os dois; `Livros.Dados` referencia `Livros.Dominio`.
 
-## Convenções
+### Rodar
 
-Classes, métodos, arquivos e propriedades em **PascalCase e português**
-(`LivrosController`, `GetLivros`, `ContextoLivros`). Termos técnicos ficam em inglês
-(`Controller`, `Service`, `Dto`).
-
-O JSON sai em **snake_case**, igual às colunas do banco:
-
-```csharp
-opcoes.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-```
-
-Isso é aplicado em dois lugares — `AddJsonOptions` (o que a API devolve) e
-`ConfigureHttpJsonOptions` (o que o Swagger documenta). Sem o segundo, o Swagger
-mostraria camelCase enquanto a API responde snake_case.
-
-## Modelo de dados
-
-Quatro tabelas vêm do time de modelagem e a API **não as altera** — o mapeamento é
-marcado com `ExcludeFromMigrations()`, então nenhuma migration toca nelas:
-
-- `usuarios`, `livros`, `livros_salvos`, `interacoes`
-
-Uma tabela é da API e entra nas migrations:
-
-- `livros_similares` — `(id_livro, posicao)` como chave, `id_livro_similar` e `score`.
-  Preenchida pelo pipeline de ML, lida pelo endpoint de recomendações.
-
-Se depois o time decidir que o EF Core deve ser dono do schema inteiro, basta remover
-as chamadas de `ExcludeFromMigrations()` nas configurações em `Livros.Dados/Configuracoes`.
-
-## Como rodar
-
-Configure a connection string usando variável de ambiente ou o arquivo local **não versionado** `appsettings.Development.json`:
-
+A conexão com o banco vem de `src/Livros.Api/appsettings.Development.json` (não versionado; modelo
+em `appsettings.Development.json.example`) ou da variável de ambiente
+`ConnectionStrings__BancoLivros`:
 
 ```bash
-set ConnectionStrings__BancoLivros=Host=localhost;Port=5432;Database=livros_pi;Username=postgres;Password=SUA_SENHA
+dotnet run --project src/Livros.Api --launch-profile http
 ```
 
-Aplique a migration:
+Swagger em `http://localhost:5267/swagger`. `GET /saude` mostra se o banco responde e se a
+similaridade já foi calculada.
 
-```bash
-dotnet ef database update --project src/Livros.Dados --startup-project src/Livros.Api
-```
+### Convenções
 
-Suba a API:
+- Classes, métodos e propriedades em **PascalCase e português** (`LivrosController`,
+  `ContextoLivros`); termos técnicos em inglês (`Controller`, `Service`, `Dto`).
+- JSON em **snake_case**, igual às colunas do banco. A política é aplicada em `AddJsonOptions`
+  (respostas) e em `ConfigureHttpJsonOptions` (Swagger); sem o segundo, o Swagger mostraria
+  camelCase.
+- Consultas só de leitura usam `AsNoTracking()`.
+- A busca escapa `%` e `_` digitados pelo usuário (`Filtros.MontarPadraoDeBusca`) antes do `ILIKE`.
+- A coluna `categoria` guarda vários rótulos separados por vírgula. `CategoriasService` usa
+  `FromSql` com `LATERAL unnest(string_to_array(...))` para separá-los, o único SQL escrito à mão.
 
-```bash
-dotnet run --project src/Livros.Api
-```
+### Modelo de dados
 
-Swagger em `http://localhost:<porta>/swagger`. A porta aparece no console.
+As tabelas com dados de usuário são criadas pelos scripts em `database/` e mapeadas com
+`ExcludeFromMigrations()`, então nenhuma migration mexe nelas:
 
-## Endpoints
-
-| Método | Rota | Descrição |
+| Tabela | Script | Conteúdo |
 |---|---|---|
-| GET | `/livros` | lista paginada; `pagina`, `tamanhoPagina`, `categoria`, `busca` |
-| GET | `/livros/{idLivro}` | detalhe do livro |
-| GET | `/livros/{idLivro}/recomendacoes` | similares; `total` (1–50) |
-| GET | `/categorias` | categorias atômicas com contagem |
-| GET | `/usuarios` | lista paginada — acesso reservado a administradores (papel ainda não concedido) |
-| POST | `/usuarios` | cria usuário |
-| GET | `/usuarios/{idUsuario}` | detalhe |
-| PUT | `/usuarios/{idUsuario}` | atualiza nome e email |
-| PUT | `/usuarios/{idUsuario}/senha` | troca a senha (exige a atual) |
-| DELETE | `/usuarios/{idUsuario}` | remove |
-| GET | `/saude` | estado do banco e se a similaridade já foi calculada |
+| `usuarios`, `livros`, `livros_salvos`, `interacoes` | `01_criar_tabelas.sql` (+ `04_mensageria.sql`) | contas, catálogo, biblioteca e eventos |
+| `avaliacoes` | `05_avaliacoes.sql` | nota de 1 a 5 por usuário e livro (única por par) |
 
-Os endpoints `GET/PUT/DELETE /usuarios/{id}` e `PUT /usuarios/{id}/senha` exigem sessão do titular. `POST /usuarios` continua disponível para compatibilidade com o CRUD e criação de contas, mas **prefira `POST /auth/cadastro`**, que também inicia a sessão. A lista completa de contas não é acessível aos usuários comuns.
+Só `livros_similares` é criada por migration: chave `(id_livro, posicao)`, com `id_livro_similar` e
+`score`. O pipeline de ML preenche essa tabela.
 
-### Autenticação (Etapa 9)
+### Segurança
 
-| Método | Rota | Acesso |
+- Sessão por cookie `HttpOnly`. As rotas de usuário só aceitam o titular da sessão.
+- Toda requisição que altera dados (POST, PUT, PATCH, DELETE) exige o header
+  `X-NextRead-Request: 1`, que protege contra CSRF.
+- O `senha_hash` nunca sai da API: o `UsuarioDto` não tem esse campo.
+- A listagem de todos os usuários exige o papel de administrador, que ainda não foi concedido a ninguém.
+
+### Endpoints
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| POST | `/auth/cadastro` | público | cadastra e já inicia a sessão |
+| POST | `/auth/entrar` | público | verifica a senha e inicia a sessão |
+| GET | `/auth/me` | sessão | perfil próprio (401 para visitante) |
+| POST | `/auth/sair` | sessão | encerra a sessão |
+| GET | `/livros` | público | lista paginada; `pagina`, `tamanhoPagina`, `categoria`, `busca` |
+| GET | `/livros/{id}` | público | detalhe; com sessão, publica o evento `visualizacao` |
+| GET | `/livros/{id}/recomendacoes` | público | parecidos com o livro; `total` de 1 a 50 |
+| GET | `/categorias` | público | categorias separadas, com a contagem de livros |
+| GET, PUT, DELETE | `/livros/{id}/avaliacao` | sessão | nota do usuário: `{ "nota": 1..5 }` ou `null` |
+| GET | `/usuarios/me/para-voce` | sessão | lista "Para você"; `total` de 1 a 50 (padrão 20) |
+| GET, POST, DELETE | `/usuarios/{id}/livros-salvos[/{idLivro}]` | titular | biblioteca; publica `salvou` e `removeu_salvo` |
+| GET, PUT, DELETE | `/usuarios/{id}` | titular | conta; `PUT /usuarios/{id}/senha` troca a senha (exige a atual) |
+| POST | `/usuarios` | público | cadastro mantido por compatibilidade; prefira `/auth/cadastro` |
+| GET | `/usuarios` | administrador | lista paginada de contas |
+| GET | `/saude` | público | estado do banco e da similaridade |
+
+### Recomendações
+
+**Parecidos com este livro** (`/livros/{id}/recomendacoes`): lê o top-N já calculado em
+`livros_similares` (`origem: "tabela"`). Se o modelo ainda não foi treinado, devolve livros da
+mesma categoria (`origem: "categoria"`, sem pontuação).
+
+**Para você** (`/usuarios/me/para-voce`): KNN baseado em itens, calculado na hora em C#
+(`CalculadoraParaVoce` e `ParaVoceService`):
+
+- Cada livro do usuário tem um peso `nota − 3` (5 → +2, 3 → 0, 1 → −2). Livro só salvo vale +1;
+  se também tiver nota, vale a nota.
+- Cada um dos 10 vizinhos desse livro em `livros_similares` recebe `peso × similaridade`, e a
+  soma dá a pontuação. Uma nota baixa afasta os vizinhos daquele livro.
+- Ficam de fora os livros do usuário e os que somaram zero ou menos.
+- O dataset trata cada edição como um livro diferente ("Pride and Prejudice (Penguin Classics)",
+  "Pride & Prejudice"...). Por isso os títulos são comparados sem o que está entre parênteses, sem
+  pontuação e com "&" lido como "and": a lista não sugere outra edição de um livro do usuário e
+  mostra cada obra uma vez só.
+- Motivos: os até 2 livros do usuário que mais contribuíram positivamente.
+- Se os vizinhos não chegam ao total pedido, a lista é completada com livros da categoria do livro
+  de maior nota (primeiro a categoria idêntica, depois as que começam pela principal). Esses itens
+  vêm com `origem: "categoria"`.
+- Sem nenhuma nota alta nem livro salvo, a resposta é `origem: "sem_dados"` com a lista vazia.
+
+| Livro sugerido | Vizinho de | Soma |
 |---|---|---|
-| POST | `/auth/cadastro` | público; cadastra e cria sessão |
-| POST | `/auth/entrar` | público; verifica senha e cria sessão |
-| GET | `/auth/me` | autenticado; perfil próprio |
-| POST | `/auth/sair` | autenticado; encerra sessão |
-| GET/POST/DELETE | `/usuarios/{idUsuario}/livros-salvos[/{idLivro}]` | somente titular autenticado |
+| Quincas Borba | Dom Casmurro, 5★ (0,62) e O Cortiço, 4★ (0,40) | 2×0,62 + 1×0,40 = **1,64** |
+| Lua Nova | Crepúsculo, 1★ (0,80) | −2×0,80 = **−1,60** (não aparece) |
 
-Para alterações (POST/PUT/PATCH/DELETE), enviar header `X-NextRead-Request: 1`. O front usa cookie `HttpOnly` e `credentials: 'include'`. Consulte [`../docs/sprint2/ETAPA9_AUTENTICACAO.md`](../docs/sprint2/ETAPA9_AUTENTICACAO.md).
+### Mensageria
 
-O `senha_hash` nunca sai da API — o `UsuarioDto` não tem esse campo.
+A API publica `visualizacao`, `salvou` e `removeu_salvo` numa fila do Azure Service Bus por meio de
+`IPublicadorDeInteracoes`, depois que a ação deu certo no banco. Sem a configuração `ServiceBus`, a
+API usa um publicador desligado e continua funcionando. O lado do consumidor está em
+[`../mensageria/README.md`](../mensageria/README.md).
 
-O campo `origem` na resposta de recomendações diz de onde veio o resultado:
+## Site web (`web/`)
 
-- `tabela` — top-N pré-calculado em `livros_similares` (caminho normal);
-- `categoria` — plano B por categoria, quando o modelo ainda não foi treinado.
+React 19 + Vite + TypeScript, com React Router, CSS Modules e testes em Vitest + Testing Library.
+A identidade visual (creme, marrons, serifa nos títulos) fica nos tokens de
+[`web/src/estilos/tokens.css`](../web/src/estilos/tokens.css), referência para o mobile e o desktop.
 
-## Detalhes que valem saber
+### Rodar
 
-**Consulta de categorias.** A coluna `categoria` guarda vários rótulos separados por
-vírgula. `CategoriasService` usa `FromSql` com `LATERAL unnest(string_to_array(...))`
-para quebrar em categorias atômicas — o único SQL escrito à mão no projeto.
+Precisa da API em `http://localhost:5267`.
 
-**Busca.** `%` e `_` digitados pelo usuário são escapados em `Filtros.MontarPadraoDeBusca`
-antes de virarem padrão do `ILIKE`, senão viravam curinga.
+```bash
+cd web
+npm ci
+npm run dev          # http://localhost:5500 (porta fixa: o CORS da API só libera a 5500)
+npm test             # Vitest
+npm run typecheck
+npm run lint         # oxlint
+npm run build        # gera web/dist
+```
 
-**Leitura.** Toda consulta que só serializa JSON usa `AsNoTracking()`.
+A base da API vem de `VITE_API_URL` (copie `web/.env.example` para `web/.env`). Sem ela, o site usa
+`localhost:5267` quando roda em localhost e a API do Render nos demais casos
+(`web/src/api/cliente.ts`). Todas as chamadas usam `credentials: 'include'` e mandam o header
+`X-NextRead-Request: 1` nas alterações.
+
+### Páginas
+
+| Rota | Conteúdo |
+|---|---|
+| `/` | apresentação, busca e destaques do catálogo |
+| `/explorar` | busca e filtro por categoria, paginado |
+| `/livro/:id` | detalhe, salvar na biblioteca e estrelas de 1 a 5 (logado) |
+| `/recomendacoes` | "Para você" (logado), com o motivo de cada sugestão |
+| `/recomendacoes?livro=:id` | parecidos com um livro, com a porcentagem de similaridade |
+| `/biblioteca` | livros salvos |
+| `/entrar` | entrar ou criar conta |
+
+Os endereços do protótipo antigo (`index.html`, `pesquisa.html?busca=`, `livro.html?id=`,
+`salvos.html`...) redirecionam para as rotas novas.
+
+### Publicar no Render (Static Site)
+
+Ao mergear a `PI6-Sprint3` na `main`, quem tem acesso ao painel ajusta o serviço
+`nextread-frontend` (o endereço não muda, então a API não precisa de alteração):
+
+| Configuração | Valor |
+|---|---|
+| Root Directory | `web` |
+| Build Command | `npm ci && npm run build` |
+| Publish Directory | `dist` |
+| Redirects/Rewrites | `/*` → `/index.html` (tipo **Rewrite**) |
+| Environment | `VITE_API_URL=https://dsm-g09-pi6-2026-2.onrender.com` e `NODE_VERSION=24` |
+
+Depois do deploy, abra `https://nextread-frontend.onrender.com/livro/1` direto e recarregue a
+página: se aparecer 404, o rewrite está faltando.
+
+## Testes
+
+```bash
+dotnet test src/Livros.slnx
+cd web && npm test
+```
+
+O smoke test (`tests/smoke/verificar_api.py`) roda contra a API de verdade e confere:
+- 401 sem sessão e o header anti-CSRF;
+- cadastro, login e saída;
+- acesso só ao próprio perfil e à própria biblioteca;
+- salvar e remover livros.
+
+Ele cria e apaga duas contas temporárias, então use só em banco de desenvolvimento:
+
+```bash
+python tests/smoke/verificar_api.py --base-url http://localhost:5267
+```

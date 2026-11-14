@@ -1,0 +1,14 @@
+.mensagem {
+  padding: var(--esp-4) 0;
+  color: var(--cor-texto-suave);
+}
+
+.mensagem a {
+  color: var(--cor-marrom);
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+
+.erro {
+  color: var(--cor-erro);
+}

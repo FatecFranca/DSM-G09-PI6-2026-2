@@ -28,3 +28,12 @@ BooksDataset.csv.zip
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+
+# configurações locais com credenciais
+src/Livros.Api/appsettings.Development.json
+src/Livros.Api/appsettings.Local.json
+cloud/.env
+
+# relatorios e figuras gerados pelos experimentos de mineracao
+ml/artefatos/*.json
+ml/artefatos/*.png

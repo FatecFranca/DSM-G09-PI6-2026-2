@@ -1,0 +1,25 @@
+.referencia {
+  margin-bottom: var(--esp-5);
+  padding-bottom: var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.selo {
+  align-self: flex-start;
+  padding: 1px var(--esp-2);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-papel);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.fontes {
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.titulo {
+  margin-bottom: var(--esp-3);
+}

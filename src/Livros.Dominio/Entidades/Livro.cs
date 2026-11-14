@@ -17,5 +17,6 @@ public class Livro
 
     public ICollection<LivroSalvo> LivrosSalvos { get; set; } = [];
     public ICollection<Interacao> Interacoes { get; set; } = [];
+    public ICollection<Avaliacao> Avaliacoes { get; set; } = [];
     public ICollection<LivroSimilar> Similares { get; set; } = [];
 }

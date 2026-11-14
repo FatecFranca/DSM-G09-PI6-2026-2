@@ -1,0 +1,66 @@
+.pagina {
+  display: flex;
+  justify-content: center;
+}
+
+.caixa {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--esp-6) var(--esp-5);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-papel);
+}
+
+.caixa h1 {
+  font-size: 30px;
+}
+
+.caixa > p {
+  margin-top: var(--esp-2);
+}
+
+.abas {
+  display: flex;
+  margin-top: var(--esp-5);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.abas button {
+  flex: 1;
+  margin-bottom: -1px;
+  padding: var(--esp-3) 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--cor-texto-suave);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.abas button[aria-selected='true'] {
+  border-bottom-color: var(--cor-marrom);
+  color: var(--cor-marrom);
+  font-weight: 600;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  margin-top: var(--esp-5);
+}
+
+.formulario .campo {
+  background: #fff;
+}
+
+.formulario button[type='submit'] {
+  margin-top: var(--esp-2);
+}
+
+@media (max-width: 480px) {
+  .caixa {
+    padding: var(--esp-5) var(--esp-4);
+  }
+}

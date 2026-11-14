@@ -1,0 +1,26 @@
+:root {
+  --cor-marrom: #5c3828;
+  --cor-marrom-2: #967052;
+  --cor-creme: #f3ebdd;
+  --cor-papel: #faf6ef;
+  --cor-linha: #e2d6c3;
+  --cor-texto-suave: #7a5c47;
+  --cor-erro: #9b3b2e;
+
+  --fonte-titulo: 'Fraunces Variable', Georgia, serif;
+  --fonte-texto: 'Inter Variable', system-ui, sans-serif;
+
+  --raio: 3px;
+  --raio-capa: 2px 4px 4px 2px;
+
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 40px;
+  --esp-7: 64px;
+
+  --largura-max: 1120px;
+  --largura-leitura: 68ch;
+}

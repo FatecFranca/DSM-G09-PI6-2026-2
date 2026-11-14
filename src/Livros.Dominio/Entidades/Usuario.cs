@@ -10,4 +10,5 @@ public class Usuario
 
     public ICollection<LivroSalvo> LivrosSalvos { get; set; } = [];
     public ICollection<Interacao> Interacoes { get; set; } = [];
+    public ICollection<Avaliacao> Avaliacoes { get; set; } = [];
 }

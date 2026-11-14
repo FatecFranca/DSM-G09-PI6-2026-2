@@ -9,6 +9,7 @@ public class ContextoLivros(DbContextOptions<ContextoLivros> opcoes) : DbContext
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<LivroSalvo> LivrosSalvos => Set<LivroSalvo>();
     public DbSet<Interacao> Interacoes => Set<Interacao>();
+    public DbSet<Avaliacao> Avaliacoes => Set<Avaliacao>();
     public DbSet<LivroSimilar> LivrosSimilares => Set<LivroSimilar>();
     public DbSet<CategoriaResultado> CategoriasApuradas => Set<CategoriaResultado>();
 

@@ -1,0 +1,27 @@
+.rodape {
+  margin-top: auto;
+  border-top: 1px solid var(--cor-linha);
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+}
+
+.conteudo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  padding-block: var(--esp-5);
+}
+
+.frase {
+  margin-left: auto;
+  font-family: var(--fonte-titulo);
+  font-style: italic;
+}
+
+@media (max-width: 620px) {
+  .frase {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}

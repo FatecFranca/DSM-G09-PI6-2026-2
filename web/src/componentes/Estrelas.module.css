@@ -1,0 +1,44 @@
+.estrelas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1);
+  margin-top: var(--esp-4);
+}
+
+.rotulo {
+  margin-right: var(--esp-2);
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.estrela {
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: var(--cor-marrom-2);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* vazia e cheia na mesma cor: o desenho (☆/★) ja diferencia */
+.estrela:hover,
+.estrela:focus-visible {
+  color: var(--cor-marrom);
+}
+
+.estrela:disabled {
+  cursor: progress;
+}
+
+.remover {
+  margin-left: var(--esp-3);
+  border: 0;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+}

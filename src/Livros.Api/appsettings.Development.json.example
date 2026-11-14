@@ -1,0 +1,9 @@
+{
+  "ConnectionStrings": {
+    "BancoLivros": "Host=localhost;Port=5432;Database=livros_pi;Username=postgres;Password=SUA_SENHA_LOCAL"
+  },
+  "ServiceBus": {
+    "Conexao": "",
+    "Fila": "nextread-recomendacoes"
+  }
+}

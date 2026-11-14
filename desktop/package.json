@@ -1,0 +1,63 @@
+{
+  "name": "nextread-desktop",
+  "productName": "NextRead",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo desktop NextRead (Electron + React/Vite)",
+  "main": "main.cjs",
+  "author": "Equipe NextRead - Fatec Franca",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prepare:web": "node scripts/preparar-web.cjs",
+    "start": "node scripts/verificar-build.cjs && electron .",
+    "dev": "npm run prepare:web && npm start",
+    "test": "node --test testes/*.test.cjs",
+    "dist:win": "npm run prepare:web && electron-builder --win nsis --x64 --publish never",
+    "dist:portable": "npm run prepare:web && electron-builder --win portable --x64 --publish never",
+    "dist:dir": "npm run prepare:web && electron-builder --dir --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.3.2",
+    "electron-builder": "26.18.0"
+  },
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "build": {
+    "appId": "br.edu.fatecfranca.nextread.desktop",
+    "productName": "NextRead",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.cjs",
+      "servidor.cjs",
+      "renderer/**/*",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "NextRead-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "NextRead-Portatil-${version}-${arch}.${ext}"
+    }
+  }
+}
