@@ -45,6 +45,8 @@ construtor.Services.AddScoped<CategoriasService>();
 construtor.Services.AddScoped<RecomendacoesService>();
 construtor.Services.AddScoped<UsuariosService>();
 construtor.Services.AddScoped<LivrosSalvosService>();
+construtor.Services.AddScoped<AvaliacoesService>();
+construtor.Services.AddScoped<ParaVoceService>();
 construtor.Services.AddScoped<AutenticacaoService>();
 construtor.Services.AdicionarMensageria(construtor.Configuration);
 

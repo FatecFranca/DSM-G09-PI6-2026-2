@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router'
 import { api, ErroApi } from '../api/cliente'
 import type { Detalhe } from '../api/tipos'
 import CapaLivro from '../componentes/CapaLivro'
+import Estrelas from '../componentes/Estrelas'
 import Mensagem from '../componentes/Mensagem'
 import { useCarregamento } from '../componentes/useCarregamento'
 import { useTituloPagina } from '../componentes/useTituloPagina'
@@ -144,6 +145,51 @@ function AcoesDoLivro({ livro }: { livro: Detalhe }) {
           Ver semelhantes
         </Link>
       </div>
+      {erro && <Mensagem tipo="erro">{erro}</Mensagem>}
+      {usuario && <NotaDoLivro idLivro={livro.id_livro} />}
+    </>
+  )
+}
+
+function NotaDoLivro({ idLivro }: { idLivro: number }) {
+  // sem conseguir ler a nota, as estrelas aparecem vazias e continuam funcionando
+  const consulta = useCarregamento(() => api.avaliacao(idLivro), [idLivro])
+  const [notaAgora, setNotaAgora] = useState<number | null | undefined>(undefined)
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
+
+  const nota = notaAgora !== undefined ? notaAgora : consulta.estado === 'pronto' ? consulta.dados.nota : null
+
+  async function alterar(acao: () => Promise<number | null>) {
+    setEnviando(true)
+    setErro('')
+    try {
+      setNotaAgora(await acao())
+    } catch (falha) {
+      console.error(falha)
+      setErro(
+        falha instanceof ErroApi && falha.status === 401
+          ? 'Sua sessão expirou. Entre novamente.'
+          : 'Não foi possível salvar sua nota. Tente novamente.',
+      )
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <>
+      <Estrelas
+        nota={nota}
+        desabilitado={enviando || consulta.estado === 'carregando'}
+        aoEscolher={valor => alterar(async () => (await api.avaliar(idLivro, valor)).nota)}
+        aoRemover={() =>
+          alterar(async () => {
+            await api.removerAvaliacao(idLivro)
+            return null
+          })
+        }
+      />
       {erro && <Mensagem tipo="erro">{erro}</Mensagem>}
     </>
   )

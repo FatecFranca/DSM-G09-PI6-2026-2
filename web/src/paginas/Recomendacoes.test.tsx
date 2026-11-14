@@ -1,16 +1,9 @@
 import { screen, within } from '@testing-library/react'
 import { expect, test } from 'vitest'
-import type { Salvo } from '../api/tipos'
 import { livro } from '../teste/fabricas'
 import { caminhosChamados, comoAna, renderizarApp } from '../teste/renderizar'
 
 const detalhe = (id: number, titulo: string) => ({ ...livro(id, titulo), isbn: null, descricao: null, editora: null, avaliacao_media: null })
-const salvo = (id: number, titulo: string, dia = 1): Salvo => ({
-  id_salvo: id,
-  data_salvo: `2026-11-${String(dia).padStart(2, '0')}T10:00:00Z`,
-  livro: livro(id, titulo),
-})
-
 async function cartoes() {
   const grade = await screen.findByRole('list', { name: 'Recomendações' })
   return within(grade).getAllByRole('listitem')
@@ -82,78 +75,84 @@ test('visitante e convidado a entrar sem consultar livros', async () => {
   expect(caminhosChamados(chamadas)).toEqual(['GET /auth/me'])
 })
 
-test('usuario sem livros salvos', async () => {
-  renderizarApp('/recomendacoes', { ...comoAna, 'GET /usuarios/5/livros-salvos': [] })
-  expect(await screen.findByText('Salve livros na sua biblioteca para receber recomendações.')).toBeInTheDocument()
+const ROTA_PARA_VOCE = 'GET /usuarios/me/para-voce?total=20'
+
+const motivo = (id: number, titulo: string, nota: number | null) => ({ id_livro: id, titulo, nota })
+
+test('para voce mostra as sugestoes da api com o motivo de cada uma', async () => {
+  const { chamadas } = renderizarApp('/recomendacoes', {
+    ...comoAna,
+    [ROTA_PARA_VOCE]: {
+      origem: 'avaliacoes',
+      total_avaliacoes: 2,
+      total_salvos: 1,
+      recomendacoes: [
+        { livro: livro(812, 'Quincas Borba'), pontuacao: 1.64, posicao: 1, origem: 'avaliacoes', motivos: [motivo(31, 'Dom Casmurro', 5), motivo(77, 'O Cortiço', 4)] },
+        { livro: livro(400, 'Senhora'), pontuacao: 0.55, posicao: 2, origem: 'avaliacoes', motivos: [motivo(50, 'Iracema', null)] },
+      ],
+    },
+  })
+
+  expect(await screen.findByRole('heading', { level: 2, name: 'Para você' })).toBeInTheDocument()
+  const itens = await cartoes()
+  expect(itens.map(item => within(item).getByRole('heading', { level: 3 }).textContent)).toEqual(['Quincas Borba', 'Senhora'])
+  expect(itens[0]).toHaveTextContent('Porque você deu 5★ a Dom Casmurro e 4★ a O Cortiço')
+  expect(itens[1]).toHaveTextContent('Porque você salvou Iracema')
+  expect(itens[0]).not.toHaveTextContent('Mesma categoria')
+  expect(screen.getByText('Com base em 2 avaliações e 1 livro salvo')).toBeInTheDocument()
+  expect(caminhosChamados(chamadas)).toEqual(['GET /auth/me', ROTA_PARA_VOCE])
+})
+
+test('para voce por categoria indica mesma categoria', async () => {
+  renderizarApp('/recomendacoes', {
+    ...comoAna,
+    [ROTA_PARA_VOCE]: {
+      origem: 'categoria',
+      total_avaliacoes: 1,
+      total_salvos: 0,
+      recomendacoes: [{ livro: livro(50, 'Iracema'), pontuacao: 0, posicao: 1, origem: 'categoria', motivos: [motivo(31, 'Dom Casmurro', 5)] }],
+    },
+  })
+  const [primeiro] = await cartoes()
+  expect(primeiro).toHaveTextContent('Mesma categoria')
+  expect(primeiro).toHaveTextContent('Porque você deu 5★ a Dom Casmurro')
+  expect(screen.getByText('Com base em 1 avaliação')).toBeInTheDocument()
+})
+
+test('lista completada com a categoria marca so os itens complementares', async () => {
+  renderizarApp('/recomendacoes', {
+    ...comoAna,
+    [ROTA_PARA_VOCE]: {
+      origem: 'avaliacoes',
+      total_avaliacoes: 1,
+      total_salvos: 0,
+      recomendacoes: [
+        { livro: livro(812, 'Quincas Borba'), pontuacao: 1.2, posicao: 1, origem: 'avaliacoes', motivos: [motivo(31, 'Dom Casmurro', 5)] },
+        { livro: livro(50, 'Iracema'), pontuacao: 0, posicao: 2, origem: 'categoria', motivos: [motivo(31, 'Dom Casmurro', 5)] },
+      ],
+    },
+  })
+  const [vizinho, complemento] = await cartoes()
+  expect(vizinho).not.toHaveTextContent('Mesma categoria')
+  expect(complemento).toHaveTextContent('Mesma categoria')
+  expect(complemento).toHaveTextContent('Porque você deu 5★ a Dom Casmurro')
+})
+
+test('sem notas nem salvos convida a avaliar', async () => {
+  renderizarApp('/recomendacoes', {
+    ...comoAna,
+    [ROTA_PARA_VOCE]: { origem: 'sem_dados', total_avaliacoes: 0, total_salvos: 0, recomendacoes: [] },
+  })
+  expect(await screen.findByText('Avalie ou salve livros para receber sugestões.')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Explorar livros' })).toHaveAttribute('href', '/explorar')
 })
 
-test('junta as recomendacoes da biblioteca sem repetir livros salvos', async () => {
-  renderizarApp('/recomendacoes', {
-    ...comoAna,
-    'GET /usuarios/5/livros-salvos': [salvo(10, 'Salvo A', 2), salvo(11, 'Salvo B', 1)],
-    'GET /livros/10/recomendacoes?total=12': {
-      id_livro: 10,
-      origem: 'categoria',
-      recomendacoes: [
-        { livro: livro(11, 'Salvo B'), score: 0, posicao: 1 },
-        { livro: livro(20, 'Relacionado'), score: 0, posicao: 2 },
-      ],
-    },
-    'GET /livros/11/recomendacoes?total=12': {
-      id_livro: 11,
-      origem: 'tabela',
-      recomendacoes: [
-        { livro: livro(20, 'Relacionado'), score: 0.85, posicao: 1 },
-        { livro: livro(21, 'Outro'), score: 0.52, posicao: 2 },
-      ],
-    },
-  })
-
-  const itens = await cartoes()
-  expect(itens.map(item => within(item).getByRole('heading', { level: 3 }).textContent)).toEqual(['Relacionado', 'Outro'])
-  expect(itens[0]).toHaveTextContent('Semelhante a: Salvo A, Salvo B')
-  expect(itens[0]).toHaveTextContent('Similaridade 85%')
-  expect(screen.getByText('Com base em 2 livros da sua biblioteca')).toBeInTheDocument()
-})
-
-test('usa somente os 8 livros salvos mais recentes', async () => {
-  const salvos = Array.from({ length: 10 }, (_, indice) => salvo(100 + indice, `Salvo ${indice}`, indice + 1))
-  const rotas: Record<string, unknown> = { ...comoAna, 'GET /usuarios/5/livros-salvos': salvos }
-  for (const item of salvos) {
-    rotas[`GET /livros/${item.livro.id_livro}/recomendacoes?total=12`] = {
-      id_livro: item.livro.id_livro,
-      origem: 'tabela',
-      recomendacoes: [{ livro: livro(500 + item.livro.id_livro, `Sugestão ${item.livro.id_livro}`), score: 0.5, posicao: 1 }],
-    }
-  }
-
-  const { chamadas } = renderizarApp('/recomendacoes', rotas)
-
-  await cartoes()
-  const consultas = caminhosChamados(chamadas).filter(rota => rota.endsWith('/recomendacoes?total=12'))
-  expect(consultas).toHaveLength(8)
-  expect(consultas).not.toContain('GET /livros/100/recomendacoes?total=12')
-  expect(consultas).not.toContain('GET /livros/101/recomendacoes?total=12')
-  expect(screen.getByText('Com base em 8 livros da sua biblioteca (os 8 mais recentes)')).toBeInTheDocument()
-})
-
-test('falha parcial mostra o que deu certo e avisa', async () => {
-  renderizarApp('/recomendacoes', {
-    ...comoAna,
-    'GET /usuarios/5/livros-salvos': [salvo(10, 'Salvo A', 2), salvo(11, 'Salvo B', 1)],
-    'GET /livros/10/recomendacoes?total=12': { id_livro: 10, origem: 'tabela', recomendacoes: [{ livro: livro(20, 'Achado'), score: 0.6, posicao: 1 }] },
-  })
-  expect(await cartoes()).toHaveLength(1)
-  expect(screen.getByText('Alguns livros da sua biblioteca não puderam ser analisados.')).toBeInTheDocument()
-})
-
-test('falha total', async () => {
-  renderizarApp('/recomendacoes', { ...comoAna, 'GET /usuarios/5/livros-salvos': [salvo(10, 'Salvo A')] })
+test('falha ao carregar o para voce', async () => {
+  renderizarApp('/recomendacoes', { ...comoAna, [ROTA_PARA_VOCE]: { status: 500 } })
   expect(await screen.findByText('Não foi possível carregar as recomendações. Tente novamente em instantes.')).toBeInTheDocument()
 })
 
-test('sessao expirada ao consultar a biblioteca', async () => {
-  renderizarApp('/recomendacoes', { ...comoAna, 'GET /usuarios/5/livros-salvos': { status: 401 } })
+test('sessao expirada ao consultar o para voce', async () => {
+  renderizarApp('/recomendacoes', { ...comoAna, [ROTA_PARA_VOCE]: { status: 401 } })
   expect(await screen.findByText(/Sua sessão expirou. Entre novamente./)).toBeInTheDocument()
 })

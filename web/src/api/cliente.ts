@@ -1,4 +1,4 @@
-import type { Categoria, Detalhe, Pagina, Recomendacoes, Salvo, Usuario } from './tipos'
+import type { Avaliacao, Categoria, Detalhe, Pagina, ParaVoce, Recomendacoes, Salvo, Usuario } from './tipos'
 
 const API_LOCAL = 'http://localhost:5267'
 const API_PRODUCAO = 'https://dsm-g09-pi6-2026-2.onrender.com'
@@ -118,6 +118,10 @@ export function criarCliente(
       requisitar<Salvo>(`/usuarios/${idUsuario}/livros-salvos/${idLivro}`, 'POST'),
     remover: (idUsuario: number, idLivro: number) =>
       requisitar<void>(`/usuarios/${idUsuario}/livros-salvos/${idLivro}`, 'DELETE'),
+    avaliacao: (idLivro: number) => requisitar<Avaliacao>(`/livros/${idLivro}/avaliacao`),
+    avaliar: (idLivro: number, nota: number) => requisitar<Avaliacao>(`/livros/${idLivro}/avaliacao`, 'PUT', { nota }),
+    removerAvaliacao: (idLivro: number) => requisitar<void>(`/livros/${idLivro}/avaliacao`, 'DELETE'),
+    paraVoce: () => requisitar<ParaVoce>('/usuarios/me/para-voce?total=20'),
   }
 }
 

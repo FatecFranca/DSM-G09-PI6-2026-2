@@ -53,3 +53,30 @@ export interface Recomendacoes {
   origem: string
   recomendacoes: Sugestao[]
 }
+
+export interface Avaliacao {
+  nota: number | null
+}
+
+// nota nula = o livro so esta salvo na biblioteca
+export interface Motivo {
+  id_livro: number
+  titulo: string
+  nota: number | null
+}
+
+export interface SugestaoParaVoce {
+  livro: Livro
+  pontuacao: number
+  posicao: number
+  // "categoria" = complemento quando os vizinhos dos seus livros nao bastam
+  origem: 'avaliacoes' | 'categoria'
+  motivos: Motivo[]
+}
+
+export interface ParaVoce {
+  origem: 'avaliacoes' | 'categoria' | 'sem_dados'
+  total_avaliacoes: number
+  total_salvos: number
+  recomendacoes: SugestaoParaVoce[]
+}

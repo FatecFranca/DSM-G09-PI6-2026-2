@@ -120,3 +120,35 @@ describe('erros', () => {
     expect(erro).toMatchObject({ status: 0, message: 'O servidor demorou para responder. Tente novamente em instantes.' })
   })
 })
+
+describe('avaliacoes e para voce', () => {
+  test('avaliar envia put com a nota em json e o cabecalho de protecao', async () => {
+    const { cliente, chamadas } = montar({ 'PUT /livros/8/avaliacao': { nota: 4 } })
+
+    expect(await cliente.avaliar(8, 4)).toEqual({ nota: 4 })
+    expect(chamadas[0].init.method).toBe('PUT')
+    expect(chamadas[0].init.body).toBe('{"nota":4}')
+    expect(chamadas[0].init.credentials).toBe('include')
+    expect(cabecalhos(chamadas[0]).get('X-NextRead-Request')).toBe('1')
+  })
+
+  test('remover avaliacao envia delete com o cabecalho de protecao', async () => {
+    const { cliente, chamadas } = montar({ 'DELETE /livros/8/avaliacao': { status: 204 } })
+
+    await cliente.removerAvaliacao(8)
+
+    expect(chamadas[0].init.method).toBe('DELETE')
+    expect(cabecalhos(chamadas[0]).get('X-NextRead-Request')).toBe('1')
+  })
+
+  test('consulta a nota e o para voce nas rotas certas', async () => {
+    const paraVoce = { origem: 'sem_dados', total_avaliacoes: 0, total_salvos: 0, recomendacoes: [] }
+    const { cliente } = montar({
+      'GET /livros/8/avaliacao': { nota: null },
+      'GET /usuarios/me/para-voce?total=20': paraVoce,
+    })
+
+    expect(await cliente.avaliacao(8)).toEqual({ nota: null })
+    expect(await cliente.paraVoce()).toEqual(paraVoce)
+  })
+})

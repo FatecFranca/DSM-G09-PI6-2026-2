@@ -19,3 +19,7 @@
   font-size: 12px;
   line-height: 1.4;
 }
+
+.titulo {
+  margin-bottom: var(--esp-3);
+}
