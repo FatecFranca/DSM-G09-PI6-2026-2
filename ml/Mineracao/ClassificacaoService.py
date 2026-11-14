@@ -14,23 +14,47 @@ from typing import Iterable
 
 import joblib
 import numpy as np
+from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 
 from Mineracao.BancoDados import AbrirConexao
 
 NomeDoArquivoDoClassificador = "modelo-categorias.joblib"
 NomeDoArquivoDoRelatorio = "avaliacao-classificacao.json"
+NomeDaFiguraDaMatriz = "matriz-confusao.png"
+
+NomesDosModelos = (
+    "classe_majoritaria", "naive_bayes", "naive_bayes_chi2", "knn_euclidiano_chi2", "knn_cosseno",
+)
+ModelosComSelecao = {"naive_bayes_chi2", "knn_euclidiano_chi2"}
+VizinhosDoKnnCosseno = 25
+
+
+def _CriarClassificador(nome: str, totalDeTreino: int):
+    if nome == "classe_majoritaria":
+        return DummyClassifier(strategy="most_frequent")
+    if nome == "knn_euclidiano_chi2":
+        # configuracao padrao do scikit-learn (k=5, distancia euclidiana), mantida para comparar
+        return KNeighborsClassifier(n_neighbors=min(5, totalDeTreino))
+    if nome == "knn_cosseno":
+        # cosseno ignora o tamanho do vetor; o vizinho mais parecido vota com mais peso
+        return KNeighborsClassifier(
+            n_neighbors=min(VizinhosDoKnnCosseno, totalDeTreino),
+            metric="cosine", weights="distance", algorithm="brute",
+        )
+    return MultinomialNB(alpha=1.0)
 
 
 @dataclass
 class ModeloClassificacao:
     Vetorizador: TfidfVectorizer
-    Seletor: SelectKBest
-    Classificador: MultinomialNB
+    Seletor: SelectKBest | None
+    Classificador: MultinomialNB | KNeighborsClassifier
     Categorias: list[str]
     TreinadoEm: str
 
@@ -147,27 +171,37 @@ def TreinarComExemplos(
     vetorizador = CriarVetorizador()
     Xtreino = vetorizador.fit_transform(treinoX)
     Xteste = vetorizador.transform(testeX)
-    base = MultinomialNB(alpha=1.0)
-    base.fit(Xtreino, treinoY)
-    metricasBase = _Metrica(testeY, base.predict(Xteste), categorias)
 
     kReal = min(kAtributos, Xtreino.shape[1])
-    seletor = SelectKBest(score_func=chi2, k=kReal)
-    XtreinoSelecionado = seletor.fit_transform(Xtreino, treinoY)
+    seletor = SelectKBest(score_func=chi2, k=kReal).fit(Xtreino, treinoY)
+    XtreinoSelecionado = seletor.transform(Xtreino)
     XtesteSelecionado = seletor.transform(Xteste)
-    selecionado = MultinomialNB(alpha=1.0)
-    selecionado.fit(XtreinoSelecionado, treinoY)
-    metricasSelecionado = _Metrica(testeY, selecionado.predict(XtesteSelecionado), categorias)
+
+    # todos os modelos sao medidos no mesmo conjunto de teste
+    metricas: dict[str, dict] = {}
+    for nome in NomesDosModelos:
+        usaSelecao = nome in ModelosComSelecao
+        classificador = _CriarClassificador(nome, len(treinoY))
+        classificador.fit(XtreinoSelecionado if usaSelecao else Xtreino, treinoY)
+        previsto = classificador.predict(XtesteSelecionado if usaSelecao else Xteste)
+        metricas[nome] = _Metrica(testeY, previsto, categorias)
+
+    # a classe majoritaria e so a referencia minima, nunca vira artefato
+    nomeDoMelhor = max(
+        (nome for nome in NomesDosModelos if nome != "classe_majoritaria"),
+        key=lambda nome: metricas[nome]["f1_macro"],
+    )
 
     # O artefato operacional e treinado com todos os exemplos rotulados;
     # as metricas acima permanecem exclusivamente do conjunto de teste.
     vetorizadorFinal = CriarVetorizador()
     Xtodos = vetorizadorFinal.fit_transform(textos)
-    kFinal = min(kAtributos, Xtodos.shape[1])
-    seletorFinal = SelectKBest(score_func=chi2, k=kFinal)
-    XtodosSelecionados = seletorFinal.fit_transform(Xtodos, rotulos)
-    classificadorFinal = MultinomialNB(alpha=1.0)
-    classificadorFinal.fit(XtodosSelecionados, rotulos)
+    seletorFinal = None
+    if nomeDoMelhor in ModelosComSelecao:
+        seletorFinal = SelectKBest(score_func=chi2, k=min(kAtributos, Xtodos.shape[1]))
+        Xtodos = seletorFinal.fit_transform(Xtodos, rotulos)
+    classificadorFinal = _CriarClassificador(nomeDoMelhor, len(rotulos))
+    classificadorFinal.fit(Xtodos, rotulos)
 
     modelo = ModeloClassificacao(
         Vetorizador=vetorizadorFinal, Seletor=seletorFinal,
@@ -175,7 +209,7 @@ def TreinarComExemplos(
         TreinadoEm=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
     relatorio = {
-        "metodo": "TF-IDF + MultinomialNB; comparacao com SelectKBest(chi2)",
+        "metodo": "TF-IDF comparando classe majoritaria, MultinomialNB (com e sem SelectKBest(chi2)) e KNN (euclidiano com chi2 e cosseno)",
         "alvo": "categoria principal; titulos/autores/descricao sao as entradas",
         "avaliacao": "holdout estratificado; preprocessadores ajustados somente no treino",
         "seed": randomState,
@@ -188,8 +222,18 @@ def TreinarComExemplos(
         "contagem_por_categoria": {categoria: contagem[categoria] for categoria in categorias},
         "termos_baseline": int(Xtreino.shape[1]),
         "termos_selecionados": int(kReal),
-        "baseline_sem_selecao": metricasBase,
-        "modelo_com_selecao": metricasSelecionado,
+        "baseline_sem_selecao": metricas["naive_bayes"],
+        "modelo_com_selecao": metricas["naive_bayes_chi2"],
+        "comparacao": [
+            {
+                "modelo": nome,
+                "acuracia": metricas[nome]["acuracia"],
+                "f1_macro": metricas[nome]["f1_macro"],
+                "f1_ponderado": metricas[nome]["f1_ponderado"],
+            }
+            for nome in NomesDosModelos
+        ],
+        "melhor_modelo": {"nome": nomeDoMelhor, **metricas[nomeDoMelhor]},
         "observacao": "Metricas referem-se somente ao teste. O artefato final foi reajustado em todos os registros rotulados.",
     }
     return ResultadoTreinamento(Modelo=modelo, Relatorio=relatorio)
@@ -207,7 +251,9 @@ def PreverCategorias(
     for inicio in range(0, len(indices), tamanhoBloco):
         blocoIndices = indices[inicio:inicio + tamanhoBloco]
         blocoTextos = [textos[i] for i in blocoIndices]
-        X = modelo.Seletor.transform(modelo.Vetorizador.transform(blocoTextos))
+        X = modelo.Vetorizador.transform(blocoTextos)
+        if modelo.Seletor is not None:
+            X = modelo.Seletor.transform(X)
         probabilidades = modelo.Classificador.predict_proba(X)
         melhores = np.argmax(probabilidades, axis=1)
         for linha, indice in enumerate(blocoIndices):

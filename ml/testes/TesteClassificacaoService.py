@@ -107,3 +107,45 @@ def TesteCorpusHibridoRespeitaCategoriaExistente(Treino):
     modelo = TreinarModeloComCorpus(ids, textos, minDf=1, maxDf=1.0)
     assert modelo.GetTotalDeLivros() == 3
     assert 10 not in [idLivro for idLivro, _ in CalcularSimilares(modelo, 10)]
+
+
+def TesteComparacaoTemOsCincoModelosNoMesmoTeste(Treino):
+    comparacao = Treino.Relatorio["comparacao"]
+    assert [linha["modelo"] for linha in comparacao] == [
+        "classe_majoritaria", "naive_bayes", "naive_bayes_chi2", "knn_euclidiano_chi2", "knn_cosseno",
+    ]
+    for linha in comparacao:
+        assert 0 <= linha["acuracia"] <= 1
+        assert 0 <= linha["f1_macro"] <= 1
+
+
+def TesteKnnFuncionaComMenosLivrosQueVizinhos():
+    # 3 generos x 10 livros: o treino fica com 24, menos que os 25 vizinhos do knn
+    poucos = [exemplo for indice, exemplo in enumerate(_Exemplos()) if indice % 18 < 10]
+    resultado = TreinarComExemplos(poucos, suporteMinimo=5, maxCategorias=3, minDf=1, kAtributos=12)
+    nomes = [linha["modelo"] for linha in resultado.Relatorio["comparacao"]]
+    assert "knn_cosseno" in nomes
+
+
+def TesteMelhorModeloNuncaEhClasseMajoritaria(Treino):
+    melhor = Treino.Relatorio["melhor_modelo"]
+    assert melhor["nome"] != "classe_majoritaria"
+    assert sum(sum(linha) for linha in melhor["matriz_confusao"]) == Treino.Relatorio["total_teste"]
+
+
+def TesteArtefatoSemSeletorPreveCategorias():
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.neighbors import KNeighborsClassifier
+
+    from Mineracao.ClassificacaoService import ModeloClassificacao
+
+    textos, rotulos = zip(*_Exemplos())
+    vetorizador = TfidfVectorizer()
+    classificador = KNeighborsClassifier(n_neighbors=5, metric="cosine", algorithm="brute")
+    classificador.fit(vetorizador.fit_transform(textos), rotulos)
+    modelo = ModeloClassificacao(
+        Vetorizador=vetorizador, Seletor=None, Classificador=classificador,
+        Categorias=sorted(set(rotulos)), TreinadoEm="teste",
+    )
+    respostas = PreverCategorias(modelo, ["magical wizards realm", "", "quantum physics"], limiar=0)
+    assert respostas == ["Fantasy", None, "Science"]

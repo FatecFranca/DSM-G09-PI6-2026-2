@@ -10,11 +10,12 @@ from time import perf_counter
 
 from Mineracao import ClassificacaoService
 from Mineracao.Configuracao import GetConfiguracao
+from Mineracao.GraficosService import SalvarMatrizDeConfusao
 
 
-def Main() -> None:
+def Main(argv: list[str] | None = None) -> dict:
     parser = argparse.ArgumentParser(
-        description="classifica categorias de livros, avalia e compara selecao de atributos"
+        description="classifica o genero dos livros e compara modelos no mesmo teste"
     )
     parser.add_argument("--suporte-minimo", type=int, default=30,
                         help="minimo de exemplos por categoria")
@@ -28,7 +29,7 @@ def Main() -> None:
                         help="frequencia minima dos termos")
     parser.add_argument("--teste", type=float, default=0.2,
                         help="proporcao reservada exclusivamente a avaliacao")
-    argumentos = parser.parse_args()
+    argumentos = parser.parse_args(argv)
 
     inicio = perf_counter()
     print("carregando livros rotulados do banco...")
@@ -40,23 +41,30 @@ def Main() -> None:
         maxFeatures=argumentos.max_features, kAtributos=argumentos.k_atributos,
         minDf=argumentos.min_df,
     )
+    relatorio = resultado.Relatorio
+    melhor = relatorio["melhor_modelo"]
+
     diretorio = GetConfiguracao().DiretorioArtefatos
     caminhoModelo = ClassificacaoService.SalvarClassificador(resultado.Modelo, diretorio)
     caminhoRelatorio = diretorio / ClassificacaoService.NomeDoArquivoDoRelatorio
-    caminhoRelatorio.write_text(
-        json.dumps(resultado.Relatorio, indent=2, ensure_ascii=False), encoding="utf-8"
+    caminhoRelatorio.write_text(json.dumps(relatorio, indent=2, ensure_ascii=False), encoding="utf-8")
+    caminhoFigura = SalvarMatrizDeConfusao(
+        melhor["matriz_confusao"], relatorio["categorias"],
+        diretorio / ClassificacaoService.NomeDaFiguraDaMatriz,
     )
 
-    basico = resultado.Relatorio["baseline_sem_selecao"]
-    selecionado = resultado.Relatorio["modelo_com_selecao"]
-    print(f"Treino: {resultado.Relatorio['total_treino']} / teste: {resultado.Relatorio['total_teste']}")
-    print(f"Categorias: {len(resultado.Relatorio['categorias'])}")
-    print(f"F1 macro baseline: {basico['f1_macro']:.3f}")
-    print(f"F1 macro com selecao: {selecionado['f1_macro']:.3f}")
+    print(f"Treino: {relatorio['total_treino']} / teste: {relatorio['total_teste']}")
+    print(f"Categorias: {len(relatorio['categorias'])}")
+    print(f"{'modelo':<22}{'acuracia':>10}{'f1 macro':>10}")
+    for linha in relatorio["comparacao"]:
+        print(f"{linha['modelo']:<22}{linha['acuracia']:>10.3f}{linha['f1_macro']:>10.3f}")
+    print(f"Melhor modelo (artefato): {melhor['nome']}")
     print(f"Modelo: {caminhoModelo}")
     print(f"Relatorio: {caminhoRelatorio}")
+    print(f"Matriz de confusao: {caminhoFigura}")
     print(f"Duracao: {perf_counter() - inicio:.1f}s")
     print("O modelo NAO modifica as recomendacoes existentes ate voce usar --hibrido.")
+    return relatorio
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 # Pipeline de mineração de dados — Python
 
-Ingestão do dataset, recomendação por conteúdo e experimentos de classificação
-supervisionada. **Não é um serviço HTTP**: os scripts rodam pontualmente. A API em
+Ingestão do dataset, recomendação por conteúdo e experimentos de mineração de dados
+(classificação supervisionada e clusterização). As fases do processo (CRISP-DM) e os
+resultados estão em [`../docs/mineracao-de-dados.md`](../docs/mineracao-de-dados.md).
+**Não é um serviço HTTP**: os scripts rodam pontualmente. A API em
 [`../src`](../src) lê a tabela `livros_similares` preenchida pelo treinamento, e
 não depende do Python para responder requisições.
 
@@ -40,12 +42,16 @@ ml/
 │   ├── BancoDados.py           conexão psycopg
 │   ├── IngestaoService.py      limpeza do CSV + carga por COPY
 │   ├── RecomendacaoService.py  TF-IDF, cosseno, persistência do top-N
-│   ├── ClassificacaoService.py  classificação supervisionada + chi²
+│   ├── ClassificacaoService.py  classificação supervisionada (4 modelos comparados)
+│   ├── ClusterizacaoService.py  TF-IDF → SVD → KMeans, cotovelo e silhouette
+│   ├── GraficosService.py       matriz de confusão e curvas de k (PNG)
 │   └── AvaliacaoService.py   proxy de avaliação do top-N
 ├── Scripts/
 │   ├── CarregarDataset.py
 │   ├── TreinarRecomendador.py
 │   ├── TreinarClassificador.py
+│   ├── TreinarClusterizacao.py
+│   ├── ExecutarMineracao.py     classificador + clusterização num comando só
 │   └── AvaliarRecomendador.py
 ├── testes/                     pytest, roda sem banco
 └── artefatos/                  modelo treinado (fora do git)
@@ -143,25 +149,32 @@ A execução realiza:
 1. Identificação do problema: classificação de gêneros a partir dos textos;
 2. Pré-processamento e seleção de registros com categoria conhecida;
 3. Divisão estratificada **80% treino / 20% teste**, com seed 42;
-4. Baseline **TF-IDF + Multinomial Naive Bayes**;
-5. Seleção supervisionada **SelectKBest(chi²)** ajustada **somente no treino**;
-6. Comparação no mesmo conjunto de teste: acurácia, precisão/recall/F1 por classe,
+4. Referência mínima: **classe majoritária** (`DummyClassifier`);
+5. **TF-IDF + Multinomial Naive Bayes**, com e sem seleção **SelectKBest(chi²)**
+   ajustada **somente no treino**;
+6. **KNN**: configuração padrão sobre o χ² (k = 5, euclidiana) e **KNN com cosseno**
+   (k = 25, voto ponderado pela similaridade);
+7. Comparação no mesmo conjunto de teste: acurácia, precisão/recall/F1 por classe,
    F1 macro/ponderado e matriz de confusão;
-7. Ajuste do artefato final com todos os exemplos rotulados, após a avaliação.
+8. O modelo de maior F1 macro (nunca a classe majoritária) é retreinado com todos os
+   exemplos rotulados e vira o artefato.
 
 Arquivos produzidos (ignorados no git):
 
 - `artefatos/modelo-categorias.joblib` — classificador treinado;
-- `artefatos/avaliacao-classificacao.json` — métricas **reais**, a calcular no seu banco.
+- `artefatos/avaliacao-classificacao.json` — métricas do teste;
+- `artefatos/matriz-confusao.png` — matriz do melhor modelo, normalizada por gênero real.
+
+Resultado no banco local (14/11/2026, 11.961 livros de teste): KNN com cosseno com
+acurácia 0,728 e F1 macro 0,629, contra 0,466 do Naive Bayes + χ², 0,173 do KNN euclidiano
++ χ² e 0,023 da classe majoritária. O artefato do KNN tem ~19 MB, porque guarda os livros
+de treino.
 
 Opções para experimentos:
 
 ```bash
 python -m Scripts.TreinarClassificador --suporte-minimo 50 --max-categorias 15 --k-atributos 5000 --max-features 40000
 ```
-
-> Os valores das métricas dependem do catálogo local. O relatório não acompanha
-> o ZIP porque o dataset e o banco de produção não foram fornecidos.
 
 ### 4. Integrar ao recomendador, sem quebrar a API
 
@@ -181,7 +194,9 @@ python -m Scripts.AvaliarRecomendador --amostra 300 --top-n 10
 A variação híbrida utiliza o classificador **apenas quando a categoria do livro
 está vazia**. Textos desconhecidos ou com confiança abaixo de 0,75 permanecem sem
 categoria, como antes. Categorias existentes jamais são substituídas. A confiança
-do Naive Bayes é heurística (não calibrada), e o ganho deve ser avaliado.
+vem do `predict_proba` do modelo escolhido (hoje o KNN com cosseno: proporção
+ponderada dos votos dos 25 vizinhos), e o ganho
+deve ser avaliado.
 
 Se os resultados forem adequados, **somente então** atualize a tabela operacional:
 
@@ -214,16 +229,39 @@ de similaridade temática, **não** Precision@K validada por usuários e não é
 evidência de maior satisfação. Compare relatórios da configuração original e
 híbrida, preservando cópias antes de retreinar.
 
+### 6. Clusterização (aprendizado não supervisionado)
+
+```bash
+python -m Scripts.TreinarClusterizacao
+```
+
+Agrupa **todos** os livros com texto (título, autores e descrição, sem a categoria):
+TF-IDF → TruncatedSVD (100 componentes) → normalização L2 → MiniBatchKMeans.
+Avalia k = 10, 15, 20, 25, 30 e 40 pela inércia (cotovelo) e pelo silhouette numa
+amostra fixa de 10 mil livros, e treina o modelo final com k = 20. Para cada cluster
+mostra os termos mais fortes e o gênero dominante, e compara os grupos com os gêneros
+(pureza, ARI, NMI). Salva `artefatos/avaliacao-clusterizacao.json` e
+`artefatos/curvas-k.png`. Opções: `--k`, `--valores-de-k`, `--componentes`, `--amostra`.
+
+### 7. Tudo de uma vez
+
+```bash
+python -m Scripts.ExecutarMineracao
+```
+
+Roda o classificador e a clusterização em sequência (~2 min) e imprime um resumo.
+
 ## Testes
 
 ```bash
 pytest
 ```
 
-29 testes automatizados, nenhum precisa de banco. Cobrem ingestão, ordenação e
-matemática da recomendação, classificação, seleção de atributos, persistência e
-inferência do artefato em disco, não inferir categoria sem termos reconhecidos,
-integração com campos ausentes e avaliação exploratória.
+43 testes automatizados, nenhum precisa de banco. Cobrem ingestão, ordenação e
+matemática da recomendação, classificação, comparação de modelos, seleção de
+atributos, persistência e inferência do artefato em disco, não inferir categoria
+sem termos reconhecidos, integração com campos ausentes, avaliação exploratória,
+clusterização e geração das figuras.
 
 **Testes de integração ainda necessários no ambiente do projeto:** executar os
 scripts com o dataset real e banco PostgreSQL, conferir métricas, total de linhas

@@ -4,13 +4,15 @@
 
 Manter o recomendador de livros do NextRead e acrescentar uma demonstração
 reprodutível de aprendizado supervisionado e seleção de atributos, de acordo
-com os conteúdos estudados. O sistema não passa a prever vendas e não precisa
-implementar clustering ou Apriori: não são tarefas necessárias ao caso de uso.
+com os conteúdos estudados. O sistema não passa a prever vendas. Apriori não foi
+implementado; a clusterização entrou depois, para cobrir o aprendizado não supervisionado
+(ver `../docs/mineracao-de-dados.md`).
 
 ## Funcionalidades
 
-- **Aprendizado não supervisionado / similaridade**: recomendações por TF-IDF e cosseno existentes, preservadas.
-- **Aprendizado supervisionado**: classificação da categoria principal dos livros com `MultinomialNB`, usando título, autores e descrição sem incluir a categoria no texto de entrada.
+- **Similaridade**: recomendações por TF-IDF e cosseno existentes, preservadas.
+- **Aprendizado não supervisionado**: clusterização KMeans sobre o TF-IDF reduzido com TruncatedSVD, com método do cotovelo, silhouette e comparação dos grupos com os gêneros (`ClusterizacaoService.py`).
+- **Aprendizado supervisionado**: classificação da categoria principal dos livros, comparando classe majoritária, `MultinomialNB` (com e sem chi²), KNN padrão com chi² e KNN com cosseno, usando título, autores e descrição sem incluir a categoria no texto de entrada.
 - **Seleção de atributos**: `SelectKBest(chi2)` e comparação com baseline sem seleção no mesmo conjunto de teste.
 - **Pré-processamento e validação**: limpeza prévia existente, filtro de categorias raras, divisão treino/teste estratificada, F1 macro/ponderado, acurácia, métricas por classe e matriz de confusão.
 - **Pós-processamento**: relatório JSON da classificação e avaliação exploratória das recomendações por coincidência de categoria principal.
@@ -36,3 +38,9 @@ de desenvolvimento do pacote. O repositório declara versões diferentes em
 ao PostgreSQL real ou artefatos treinados. Não é possível comprovar ainda melhoria
 de métricas nem certificar um deploy; é preciso validar com os dados e serviços
 reais antes de usar `--persistir` no banco compartilhado.
+
+**Validação com o banco real (14/11/2026):** com Python 3.14 / scikit-learn 1.9 e o
+catálogo completo (99.310 livros), `python -m Scripts.ExecutarMineracao` rodou em ~2 min.
+O Naive Bayes + chi² ficou com F1 macro 0,466 e o KNN padrão com chi² com 0,173; o KNN com
+distância de cosseno, com 0,629, virou o artefato. A suíte tem 43 testes passando. O modo `--hibrido` com `--persistir` ainda não
+foi executado no banco compartilhado.

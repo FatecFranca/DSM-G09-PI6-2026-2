@@ -192,3 +192,35 @@ dotnet test src/Livros.slnx
 cd mensageria && .venv/Scripts/python -m pytest
 ```
 
+## Sprint 3 — Mineração de Dados
+
+O pipeline em [`ml/`](ml/README.md) agora tem os dois tipos de aprendizado, documentados pelas
+fases do CRISP-DM em [`docs/mineracao-de-dados.md`](docs/mineracao-de-dados.md):
+
+- **Supervisionado:** classifica o gênero do livro (20 gêneros) a partir de título, autores e
+  descrição, sem usar a categoria como entrada. Naive Bayes e KNN são comparados no mesmo teste;
+  o escolhido é o **KNN com distância de cosseno**.
+- **Não supervisionado:** KMeans sobre o TF-IDF reduzido com TruncatedSVD agrupa os 99.310
+  livros por assunto, com método do cotovelo, silhouette e comparação com os gêneros.
+
+```bash
+cd ml
+python -m Scripts.ExecutarMineracao
+```
+
+Resultado em 14/11/2026 (teste com 11.961 livros):
+
+| Modelo | Acurácia | F1 macro |
+|---|---:|---:|
+| Classe majoritária (referência) | 0,291 | 0,023 |
+| Naive Bayes | 0,591 | 0,371 |
+| Naive Bayes + seleção χ² | 0,642 | 0,466 |
+| KNN + χ² (k = 5, distância euclidiana) | 0,378 | 0,173 |
+| **KNN com cosseno (k = 25, voto ponderado)** | **0,728** | **0,629** |
+
+O mesmo KNN sai de 0,173 para 0,629 de F1 macro só trocando a distância euclidiana pelo
+cosseno, a mesma medida que o recomendador usa.
+
+KMeans com k = 20: silhouette 0,045; contra os gêneros, pureza 0,392 e NMI 0,257. Os grupos
+encontrados incluem culinária (91% `Cooking`), policial (84% `Fiction`) e religião
+(72% `Religion`). Matriz de confusão e curvas de k em [`docs/mineracao/`](docs/mineracao/).
