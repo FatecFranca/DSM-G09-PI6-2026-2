@@ -1,0 +1,52 @@
+.resumo {
+  margin-top: calc(var(--esp-3) * -1);
+  margin-bottom: var(--esp-5);
+  color: var(--cor-texto-suave);
+}
+
+.controles {
+  display: flex;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-6);
+  padding-bottom: var(--esp-5);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.controles input {
+  max-width: 360px;
+}
+
+.controles select {
+  flex: 0 0 200px;
+  cursor: pointer;
+}
+
+.remover {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.remover:hover {
+  color: var(--cor-erro);
+}
+
+@media (max-width: 620px) {
+  .controles {
+    flex-direction: column;
+  }
+
+  .controles input {
+    max-width: none;
+  }
+
+  .controles select {
+    flex-basis: auto;
+  }
+}

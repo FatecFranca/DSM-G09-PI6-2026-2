@@ -108,7 +108,7 @@ Os endpoints `GET/PUT/DELETE /usuarios/{id}` e `PUT /usuarios/{id}/senha` exigem
 | POST | `/auth/sair` | autenticado; encerra sessão |
 | GET/POST/DELETE | `/usuarios/{idUsuario}/livros-salvos[/{idLivro}]` | somente titular autenticado |
 
-Para alterações (POST/PUT/PATCH/DELETE), enviar header `X-NextRead-Request: 1`. O front usa cookie `HttpOnly` e `credentials: 'include'`. Consulte [`../docs/sprint2/ETAPA9_AUTENTICACAO.md`](../docs/sprint2/ETAPA9_AUTENTICACAO.md).
+Para alterações (POST/PUT/PATCH/DELETE), enviar header `X-NextRead-Request: 1`. O front usa cookie `HttpOnly` e `credentials: 'include'`.
 
 O `senha_hash` nunca sai da API — o `UsuarioDto` não tem esse campo.
 

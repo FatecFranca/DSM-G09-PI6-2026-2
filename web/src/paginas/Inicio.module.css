@@ -1,0 +1,38 @@
+.apresentacao {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--esp-4);
+  padding-block: var(--esp-7) var(--esp-6);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.apresentacao h1 {
+  max-width: 14ch;
+  font-size: clamp(36px, 6vw, 60px);
+  line-height: 1.05;
+}
+
+.apresentacao em {
+  color: var(--cor-marrom-2);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.apresentacao p {
+  max-width: 46ch;
+  color: var(--cor-texto-suave);
+  font-size: 18px;
+}
+
+.catalogo {
+  padding-block: var(--esp-6) var(--esp-7);
+}
+
+.cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-4);
+  margin-bottom: var(--esp-5);
+}

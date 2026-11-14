@@ -1,83 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NextRead: encontre livros parecidos com os que você gosta." />
+    <meta name="theme-color" content="#F3EBDD" />
     <title>NextRead</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-
-<body>
-
-<header class="header">
-    <a href="index.html" class="logo">NextRead</a>
-
-    <nav class="menu">
-        <a href="index.html">Início</a>
-        <a href="pesquisa.html">Explorar</a>
-        <a href="salvos.html">Meus Livros</a>
-        <a href="recomendacoes.html">Recomendações</a>
-    </nav>
-
-    <a href="login.html" class="btn-login">Entrar</a>
-</header>
-
-<main>
-
-    <section class="hero">
-        <div class="hero-conteudo">
-
-            <span class="tag">Descubra novas histórias</span>
-
-            <h1>
-                Encontre seu próximo
-                <span>livro favorito.</span>
-            </h1>
-
-            <p>
-                Explore milhares de livros, salve os títulos que mais
-                chamarem sua atenção e descubra novas recomendações.
-            </p>
-
-            <form class="barra-pesquisa" action="pesquisa.html">
-                <input
-                    type="text"
-                    name="busca"
-                    placeholder="Pesquise por título, autor ou categoria..."
-                >
-
-                <button type="submit">
-                    Pesquisar
-                </button>
-            </form>
-
-        </div>
-    </section>
-
-    <section class="secao">
-
-        <div class="secao-cabecalho">
-            <div>
-                <span class="subtitulo">Explore</span>
-                <h2>Livros do catálogo</h2>
-            </div>
-
-            <a href="pesquisa.html">Ver todos →</a>
-        </div>
-
-        <p id="mensagem-destaques" role="status" aria-live="polite">Carregando livros do catálogo...</p>
-        <div id="lista-destaques" class="livros-grid"></div>
-
-    </section>
-
-</main>
-
-<footer class="footer">
-    <strong>NextRead</strong>
-    <p>Projeto Integrador — DSM 6º Semestre — FATEC Franca</p>
-</footer>
-
-<script src="Javascript/script.js"></script>
-
-</body>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

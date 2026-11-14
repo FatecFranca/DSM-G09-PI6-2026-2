@@ -27,7 +27,7 @@ Esta etapa completa o **script de criação das quatro tabelas-base**, que são 
    dotnet run --project src/Livros.Api --launch-profile http
    ```
 
-6. Abra `http://localhost:5500/pesquisa.html` com o servidor frontend iniciado conforme `web/INTEGRACAO_API.md`, ou consulte `GET /livros` no Swagger. Confira a porta da API no perfil escolhido.
+6. Abra `http://localhost:5500/explorar` com o front iniciado (`cd web && npm ci && npm run dev`, veja o README principal), ou consulte `GET /livros` no Swagger. Confira a porta da API no perfil escolhido.
 
 ## Alternativa com dataset real
 

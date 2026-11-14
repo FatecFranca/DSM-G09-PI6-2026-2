@@ -20,7 +20,7 @@ por similaridade de conteúdo.
 |---|---|---|
 | `src/` | back-end | API em C# / ASP.NET Core com EF Core |
 | `ml/` | back-end | Pipeline Python: ingestão do dataset e modelo de recomendação |
-| `web/` | front-end | Interface HTML/CSS/JS integrada à API nas páginas de pesquisa, detalhes, recomendações, salvos e autenticação |
+| `web/` | front-end | Site em React + Vite + TypeScript integrado à API (catálogo, detalhes, biblioteca, recomendações e conta) |
 
 O back-end é poliglota de propósito: a API é C# (tipagem em tempo de compilação e
 migrations do EF Core) e a mineração de dados é Python (pandas e scikit-learn).
@@ -47,22 +47,13 @@ rodar a ingestão).
 - tela de livros salvos do usuário
 - tela de recomendações personalizadas
 
-### Front-end
+### Front-end (histórico)
 
-O protótipo da interface está localizado na pasta `web/`.
-
-Na Sprint 1, as telas eram estáticas e tinham como objetivo definir a estrutura,
-identidade visual e experiência de navegação da aplicação. Na Sprint 2, `pesquisa.html`
-e `livro.html` passaram a consultar a API; as páginas `recomendacoes.html` e `salvos.html` foram conectadas posteriormente, e `login.html` implementa cadastro e entrada por sessão.
-
-Principais telas:
-
-- `index.html` — página inicial com livros do catálogo real
-- `pesquisa.html` — exploração e pesquisa de livros
-- `livro.html` — detalhes de um livro
-- `salvos.html` — biblioteca de livros salvos
-- `recomendacoes.html` — recomendações a partir dos livros salvos (ou de um livro selecionado)
-- `login.html` — login e cadastro de usuários
+Nas Sprints 1 e 2 o front era um protótipo em HTML/CSS/JS puro (`index.html`, `pesquisa.html`,
+`livro.html`, `salvos.html`, `recomendacoes.html`, `login.html`), que aos poucos passou a consultar
+a API. Na Sprint 3 ele foi substituído pelo site em React descrito na seção
+[Sprint 3](#sprint-3--front-end-em-react-e-nova-identidade-visual); os endereços `.html` antigos
+continuam funcionando por redirecionamento.
 
 ## Arquitetura em Nuvem (Planejamento)
 
@@ -89,11 +80,6 @@ Scripts e instruções para criar as tabelas-base, carregar livros fictícios de
 Foram adicionados `cloud/Dockerfile`, `cloud/cloudbuild.yaml`, `cloud/deploy.sh` e o guia [`cloud/README.md`](cloud/README.md) para uma implantação inicial com Cloud Run, Cloud SQL e Secret Manager. **Configuração pronta no repositório; implantação real e evidências no GCP pendentes.** Esta implementação adota Cloud Run no lugar do Compute Engine descrito na seção histórica de planejamento acima.
 
 
-## Sprint 2 — Documentação intermediária (Etapa 4)
-
-O relatório por requisito, o roteiro de validação, os comandos para reproduzir os testes e a checklist de capturas estão em [`docs/sprint2/README.md`](docs/sprint2/README.md). **Não há evidência de deploy real, testes ponta a ponta ou commits individuais embutida nesse material; devem ser registrados pela equipe.**
-
-
 ## Sprint 2 — Etapa 9: login e autorização
 
 O sistema agora possui cadastro e login com hash PBKDF2 por meio do `PasswordHasher<Usuario>` existente,
@@ -104,7 +90,6 @@ para editar/apagar apenas a própria conta. A página `web/login.html` foi imple
 Os endpoints disponíveis são `POST /auth/cadastro`, `POST /auth/entrar`,
 `GET /auth/me` e `POST /auth/sair`.
 
-**Para executar:** leia [`docs/sprint2/ETAPA9_AUTENTICACAO.md`](docs/sprint2/ETAPA9_AUTENTICACAO.md).
 O script `tests/smoke/verificar_api.py` foi atualizado para testar sessão,
 separação entre usuários e logout. **Não foi possível executar um build .NET ou uma
 integração PostgreSQL neste ambiente**, portanto a validação final local permanece necessária.
@@ -125,6 +110,45 @@ Quando a tabela `livros_similares` ainda não existe ou não foi preenchida, a A
 outros livros da mesma categoria; não há pontuação TF-IDF nesse modo. O treino
 continua sendo executado separadamente (veja `ml/README.md`).
 
-Guia de validação e testes: [`docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md`](docs/sprint2/CORRECAO_CATALOGO_RECOMENDACOES.md).
+## Sprint 3 — Front-end em React e nova identidade visual
 
-### Link do Site: [NextRead](https://nextread-frontend.onrender.com/index.html)
+O `web/` foi reescrito em **React + Vite + TypeScript** (requisito de front-end por framework) com a
+identidade visual "Cafeteria" derivada da logo: creme, marrons, serifa nos títulos e pouca informação
+por tela. O back-end não mudou. As cores, fontes e espaçamentos ficam em
+[`web/src/estilos/tokens.css`](web/src/estilos/tokens.css), referência para o mobile e o desktop.
+
+### Rodar o front localmente
+
+Requisitos: Node 24 e a API rodando em `http://localhost:5267` (veja [`src/README.md`](src/README.md)).
+
+```bash
+cd web
+npm ci
+npm run dev        # http://localhost:5500 (porta fixa: o CORS da API libera só a 5500)
+npm test           # testes do front (Vitest)
+npm run build      # gera web/dist
+```
+
+Para apontar para outra API, copie `web/.env.example` para `web/.env` e ajuste `VITE_API_URL`.
+
+Rotas: `/`, `/explorar`, `/livro/:id`, `/recomendacoes` (`?livro=:id`), `/biblioteca`, `/entrar`.
+Os endereços antigos (`index.html`, `pesquisa.html?busca=`, `livro.html?id=`, `salvos.html`...)
+redirecionam para as rotas novas.
+
+### Publicar no Render (Static Site)
+
+Na hora do merge da `PI6-Sprint3` na `main`, quem tem acesso ao painel ajusta o serviço
+`nextread-frontend` (o endereço não muda, então a API não precisa de nenhuma alteração):
+
+| Configuração | Valor |
+|---|---|
+| Root Directory | `web` |
+| Build Command | `npm ci && npm run build` |
+| Publish Directory | `dist` |
+| Redirects/Rewrites | `/*` → `/index.html` (tipo **Rewrite**) |
+| Environment | `VITE_API_URL=https://dsm-g09-pi6-2026-2.onrender.com` e `NODE_VERSION=24` (o `web/.node-version` também indica Node 24) |
+
+Depois do deploy, abrir `https://nextread-frontend.onrender.com/livro/1` direto e recarregar a
+página: se aparecer 404, o rewrite está faltando.
+
+### Link do Site: [NextRead](https://nextread-frontend.onrender.com/)

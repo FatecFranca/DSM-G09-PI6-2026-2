@@ -1,0 +1,182 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--cor-creme);
+  color: var(--cor-marrom);
+  font-family: var(--fonte-texto);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(30px, 4.5vw, 44px);
+}
+
+h2 {
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cor-marrom-2);
+  outline-offset: 2px;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--largura-max);
+  margin-inline: auto;
+  padding-inline: var(--esp-4);
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: 42px;
+  padding: 0 var(--esp-4);
+  border: 1px solid var(--cor-marrom);
+  border-radius: var(--raio);
+  background: var(--cor-marrom);
+  color: var(--cor-creme);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.botao:hover {
+  background: #4a2c1f;
+}
+
+.botao:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.botao-secundario {
+  background: transparent;
+  color: var(--cor-marrom);
+}
+
+.botao-secundario:hover {
+  background: var(--cor-papel);
+}
+
+.campo {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  background: var(--cor-papel);
+  color: var(--cor-marrom);
+}
+
+.campo::placeholder {
+  color: var(--cor-texto-suave);
+}
+
+.campo:focus {
+  border-color: var(--cor-marrom-2);
+  outline: none;
+}
+
+.rotulo {
+  display: block;
+  margin-bottom: var(--esp-1);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.texto-suave {
+  color: var(--cor-texto-suave);
+}
+
+.sobretitulo {
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.link {
+  color: var(--cor-marrom);
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--cor-texto-suave);
+}
+
+.pagina {
+  padding-block: var(--esp-6) var(--esp-7);
+}
+
+.pagina-cabecalho {
+  margin-bottom: var(--esp-5);
+}
+
+.pagina-cabecalho p {
+  margin-top: var(--esp-2);
+  color: var(--cor-texto-suave);
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

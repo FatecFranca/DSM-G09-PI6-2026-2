@@ -1,0 +1,82 @@
+.livro {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  align-items: start;
+  gap: var(--esp-6);
+}
+
+.capa {
+  position: sticky;
+  top: var(--esp-5);
+}
+
+.conteudo {
+  min-width: 0;
+}
+
+.titulo {
+  margin-top: var(--esp-2);
+  overflow-wrap: anywhere;
+}
+
+.autor {
+  margin-top: var(--esp-2);
+  color: var(--cor-texto-suave);
+  font-size: 18px;
+}
+
+.ficha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3) var(--esp-6);
+  margin-top: var(--esp-5);
+  padding-block: var(--esp-4);
+  border-block: 1px solid var(--cor-linha);
+}
+
+.ficha dt {
+  color: var(--cor-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ficha dd {
+  font-weight: 500;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  margin-top: var(--esp-5);
+}
+
+.descricao {
+  max-width: var(--largura-leitura);
+  margin-top: var(--esp-6);
+}
+
+.descricao h2 {
+  margin-bottom: var(--esp-3);
+  font-size: 22px;
+}
+
+.descricao p {
+  font-size: 17px;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+@media (max-width: 720px) {
+  .livro {
+    grid-template-columns: 1fr;
+    gap: var(--esp-5);
+  }
+
+  .capa {
+    position: static;
+    width: min(220px, 60%);
+  }
+}

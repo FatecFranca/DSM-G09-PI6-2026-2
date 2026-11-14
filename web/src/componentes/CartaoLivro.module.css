@@ -1,0 +1,54 @@
+.cartao {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.link:hover .titulo {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.categoria {
+  margin-top: var(--esp-3);
+  overflow: hidden;
+  color: var(--cor-texto-suave);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.titulo {
+  display: -webkit-box;
+  margin-top: 2px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.autor {
+  overflow: hidden;
+  color: var(--cor-texto-suave);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.extras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  margin-top: var(--esp-2);
+  font-size: 13px;
+}
