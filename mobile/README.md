@@ -1,10 +1,20 @@
 # NextRead Mobile
 
-Aplicativo React Native + Expo + TypeScript para Android e iOS, integrado à API ASP.NET Core existente. A interface está em português e segue o roxo `#4C3898` e o fundo claro do site NextRead.
+Aplicativo React Native + Expo + TypeScript para Android e iOS, integrado à API ASP.NET Core existente. A interface está em português e segue o visual da branch PI6-Sprint3: marrom `#5c3828`, creme `#f3ebdd`, títulos Fraunces e textos Inter. As fontes e o logo estão incluídos no pacote.
 
 ## Colocar no projeto
 
-Extraia a pasta `mobile/` na raiz de `DSM-G09-PI6-2026-2`, ao lado de `src/`, `ml/` e `web/`. O pacote usa o ZIP fornecido como base de contrato e foi comparado com o repositório remoto, incluindo a branch `PI6-Sprint2` (commit `0b14f2535ee6f67460cbb51938780fee37bdacce`). A branch `main` consultada não contém a autenticação presente no ZIP. Use o backend do ZIP ou uma branch que contenha os mesmos endpoints; não sobreponha o backend com a versão antiga da `main`.
+Extraia a pasta `mobile/` na raiz do projeto da branch `PI6-Sprint3`, substituindo os arquivos da pasta mobile existente. Preserve seu `.env` local. Esta atualização usa como referência o commit `c3f438d1ffebbf1c34be80789d2a1a1d15c5bc2c` e altera apenas o aplicativo mobile.
+
+Após atualizar:
+
+```powershell
+cd mobile
+npm ci
+npx expo start --clear
+```
+
+O novo visual inclui o logo do site, paleta creme/marrom, fontes locais, grades de capas, capas alternativas com lombada e moldura, formulários com abas e detalhes com divisórias. O botão Voltar fica à direita no header dos detalhes. As integrações HTTP e a lógica de sessão/recomendações foram preservadas.
 
 Não é necessário alterar o banco, repetir o treino do TF-IDF ou substituir o site para adicionar o aplicativo.
 
@@ -17,6 +27,7 @@ No terminal, na raiz do projeto:
 ```powershell
 cd mobile
 npm ci
+# Apenas se ainda não houver .env:
 Copy-Item .env.example .env
 npm start
 ```
@@ -93,7 +104,9 @@ Recomendações com `origem: tabela` são identificadas como semelhança de cont
 | `src/Library.tsx` | Salvos e recomendações pessoais |
 | `src/recommendations.ts` | Agregação e remoção de duplicatas |
 | `src/Account.tsx` | Formulários da conta |
-| `src/ui.tsx` | Componentes e identidade visual |
+| `src/ui.tsx` | Componentes e grades responsivas |
+| `src/theme.ts` | Cores, fontes e capas da identidade Sprint 3 |
+| `assets/fonts/` | Fontes locais e licenças |
 | `tests/` | Testes de contratos HTTP e recomendações |
 
 ## Validação realizada
@@ -107,7 +120,7 @@ npx expo export --platform android --platform ios --platform web
 - TypeScript: aprovado.
 - Dez testes automatizados: aprovados. Incluem credenciais/header, campos de login/senha, codificação de filtros, remoção HTTP 204, expiração HTTP 401, erros de validação/rede e agregação de recomendações.
 - Bundles Android, iOS e web: exportados com sucesso. Exportar JavaScript/Hermes não equivale a gerar ou instalar APK/IPA.
-- A execução visual automatizada não pôde ser concluída por restrição do navegador no ambiente. Não foi validado em celular/emulador nem com login real no PostgreSQL. As tentativas de leitura do catálogo público tiveram timeout; `/auth/me` respondeu 401 sem sessão, como esperado. Esses limites não foram mascarados com dados de demonstração no aplicativo.
+- Nesta atualização, não foi executado teste visual em celular/emulador nem autenticação real. Confira o novo layout e os fluxos no aparelho antes de apresentar.
 
 ## Roteiro de teste no celular
 

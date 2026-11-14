@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { api } from './api';
 import { useSession } from './session';
-import { Button, Field, Notice, s } from './ui';
+import { Button, colors, fonts, Field, Notice, s } from './ui';
 export function Account() {
   const { usuario, setUsuario } = useSession();
   const [register, setRegister] = useState(false); const [nome, setNome] = useState('');
@@ -33,15 +33,18 @@ export function Account() {
       <Text style={s.subtitle}>{usuario ? 'Cuide do seu perfil e da sua conta.' : 'Entre para guardar suas descobertas e encontrar novas histórias.'}</Text>
       {error ? <Notice message={error} /> : null}{message ? <View style={s.card}><Text accessibilityRole="alert" style={s.text}>{message}</Text></View> : null}
       <View style={s.card}>
+        {!usuario && <View accessibilityRole="tablist" style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border }}>
+          {[false, true].map(value => <Pressable key={String(value)} accessibilityRole="tab" accessibilityState={{ selected: register === value }} disabled={!!busy} onPress={() => { setRegister(value); setError(''); setSenha(''); setConfirm(''); }} style={{ flex: 1, minHeight: 48, justifyContent: 'center', alignItems: 'center', borderBottomWidth: 2, borderBottomColor: register === value ? colors.primary : 'transparent' }}><Text style={{ fontFamily: fonts.medium, color: register === value ? colors.primary : colors.muted }}>{value ? 'Criar conta' : 'Entrar'}</Text></Pressable>)}
+        </View>}
         {(register || usuario) && <Field label="Nome" value={nome} onChangeText={setNome} autoComplete="name" maxLength={150} />}
         <Field label="E-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" maxLength={255} />
         {!usuario && <><Field label="Senha" value={senha} onChangeText={setSenha} secureTextEntry autoCapitalize="none" maxLength={100} autoComplete={register ? 'new-password' : 'current-password'} />
           {register && <Field label="Confirmar senha" value={confirm} onChangeText={setConfirm} secureTextEntry autoCapitalize="none" maxLength={100} />}
           <Button title={register ? 'Criar conta' : 'Entrar'} busy={busy === 'auth'} disabled={!!busy} onPress={() => void run('auth', authenticate)} />
-          <Button title={register ? 'Já tenho uma conta' : 'Quero me cadastrar'} secondary disabled={!!busy} onPress={() => { setRegister(!register); setError(''); setSenha(''); setConfirm(''); }} /></>}
+</>}
         {usuario && <Button title="Salvar perfil" busy={busy === 'profile'} disabled={!!busy} onPress={() => void run('profile', async () => { validateIdentity(); const u = await api.perfil(usuario.id_usuario, nome.trim(), email.trim()); setUsuario(u); setMessage('Perfil atualizado.'); })} />}
       </View>
-      {usuario && <><View style={s.card}><Text style={[s.text, { fontWeight: '700' }]}>Alterar senha</Text>
+      {usuario && <><View style={s.card}><Text style={[s.text, { fontFamily: fonts.heading, fontSize: 23 }]}>Alterar senha</Text>
         <Field label="Senha atual" value={senha} onChangeText={setSenha} secureTextEntry autoCapitalize="none" maxLength={100} />
         <Field label="Nova senha" value={nova} onChangeText={setNova} secureTextEntry autoCapitalize="none" maxLength={100} />
         <Field label="Confirmar nova senha" value={confirm} onChangeText={setConfirm} secureTextEntry autoCapitalize="none" maxLength={100} />
