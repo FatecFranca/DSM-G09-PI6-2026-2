@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import joblib
 import numpy as np
@@ -9,6 +10,9 @@ import scipy.sparse as sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from Mineracao.BancoDados import AbrirConexao
+
+if TYPE_CHECKING:
+    from Mineracao.ClassificacaoService import ModeloClassificacao
 
 NomeDoArquivoDoModelo = "modelo-tfidf.joblib"
 
@@ -24,6 +28,7 @@ class ModeloRecomendacao:
     Matriz: sparse.csr_matrix
     Ids: np.ndarray
     TreinadoEm: str
+    CategoriasInferidas: int = 0
 
     def GetLinhaPorId(self) -> dict[int, int]:
         if not hasattr(self, "_linhaPorId"):
@@ -71,6 +76,55 @@ def CarregarCorpus() -> tuple[np.ndarray, list[str]]:
     return np.array(ids, dtype=np.int64), textos
 
 
+def MontarCorpusComClassificacao(
+    registros: list[tuple[int, str | None, str | None, str | None, str | None]],
+    classificador: "ModeloClassificacao",
+    limiar: float = 0.75,
+) -> tuple[np.ndarray, list[str], int]:
+    """Complementa SOMENTE categorias ausentes, sem alterar os livros no banco.
+
+    Funcao pura quanto ao banco. A classificacao e feita em blocos dentro de
+    PreverCategorias e nunca muda as categorias ja cadastradas.
+    """
+    from Mineracao.ClassificacaoService import MontarTextoDeClassificacao, PreverCategorias
+
+    faltantes = [indice for indice, (_, _, categoria, _, _) in enumerate(registros)
+                 if not categoria or not categoria.strip()]
+    textosParaPrever = [
+        MontarTextoDeClassificacao(registros[i][1], registros[i][3], registros[i][4])
+        for i in faltantes
+    ]
+    previstas = PreverCategorias(classificador, textosParaPrever, limiar=limiar)
+    categoriasPrevistas = dict(zip(faltantes, previstas))
+
+    ids: list[int] = []
+    textos: list[str] = []
+    inferidas = 0
+    for indice, (idLivro, titulo, categoria, autores, descricao) in enumerate(registros):
+        categoriaAplicada = categoria
+        if not categoriaAplicada or not categoriaAplicada.strip():
+            categoriaAplicada = categoriasPrevistas.get(indice)
+            if categoriaAplicada:
+                inferidas += 1
+        ids.append(idLivro)
+        textos.append(MontarTextoDeConteudo(titulo, categoriaAplicada, autores, descricao))
+
+    return np.array(ids, dtype=np.int64), textos, inferidas
+
+
+def CarregarCorpusComClassificador(
+    classificador: "ModeloClassificacao", limiar: float = 0.75,
+) -> tuple[np.ndarray, list[str], int]:
+    registros = []
+    with AbrirConexao() as conexao, conexao.cursor(name="corpus_classificacao") as cursor:
+        cursor.itersize = 5_000
+        cursor.execute(
+            "SELECT id_livro, titulo, categoria, autores, descricao FROM livros ORDER BY id_livro"
+        )
+        registros.extend(cursor)
+    return MontarCorpusComClassificacao(registros, classificador, limiar)
+
+
 def TreinarModeloComCorpus(
     ids: np.ndarray,
     textos: list[str],
@@ -108,9 +162,17 @@ def TreinarModelo(
     maxDf: float = 0.5,
     maxFeatures: int = 120_000,
     ngramMaximo: int = 1,
+    classificador: "ModeloClassificacao | None" = None,
+    limiarCategoria: float = 0.75,
 ) -> ModeloRecomendacao:
-    ids, textos = CarregarCorpus()
-    return TreinarModeloComCorpus(ids, textos, minDf, maxDf, maxFeatures, ngramMaximo)
+    inferidas = 0
+    if classificador is None:
+        ids, textos = CarregarCorpus()
+    else:
+        ids, textos, inferidas = CarregarCorpusComClassificador(classificador, limiarCategoria)
+    modelo = TreinarModeloComCorpus(ids, textos, minDf, maxDf, maxFeatures, ngramMaximo)
+    modelo.CategoriasInferidas = inferidas
+    return modelo
 
 
 def SalvarModelo(modelo: ModeloRecomendacao, diretorio: Path) -> Path:

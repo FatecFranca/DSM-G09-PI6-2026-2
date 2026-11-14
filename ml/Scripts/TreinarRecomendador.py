@@ -25,7 +25,28 @@ def Main() -> None:
         help="calcula o top-n de todo o catalogo e grava em livros_similares",
     )
     parser.add_argument("--bloco", type=int, default=256, help="livros por bloco na persistencia")
+    parser.add_argument(
+        "--hibrido", action="store_true",
+        help="completa categorias vazias usando o classificador treinado (opcional)",
+    )
+    parser.add_argument(
+        "--limiar-categoria", type=float, default=0.75,
+        help="confianca minima para inferir categoria ausente no modo hibrido",
+    )
     argumentos = parser.parse_args()
+
+    classificador = None
+    if argumentos.hibrido:
+        from Mineracao.ClassificacaoService import CarregarClassificador
+
+        classificador = CarregarClassificador(configuracao.DiretorioArtefatos)
+        if classificador is None:
+            parser.error(
+                "classificador nao encontrado: rode primeiro "
+                "'python -m Scripts.TreinarClassificador' ou remova --hibrido"
+            )
+        if not 0 <= argumentos.limiar_categoria <= 1:
+            parser.error("--limiar-categoria precisa estar entre 0 e 1")
 
     print("montando corpus e treinando tf-idf...")
     inicio = perf_counter()
@@ -34,11 +55,16 @@ def Main() -> None:
         maxDf=argumentos.max_df,
         maxFeatures=argumentos.max_features,
         ngramMaximo=argumentos.ngram,
+        classificador=classificador,
+        limiarCategoria=argumentos.limiar_categoria,
     )
     print(
         f"treinado em {perf_counter() - inicio:.1f}s: "
         f"{modelo.GetTotalDeLivros()} livros x {modelo.GetTotalDeTermos()} termos"
     )
+
+    if argumentos.hibrido:
+        print(f"modo hibrido: {modelo.CategoriasInferidas} categorias ausentes inferidas")
 
     caminho = RecomendacaoService.SalvarModelo(modelo, configuracao.DiretorioArtefatos)
     print(f"artefato salvo em {caminho}")
