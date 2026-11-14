@@ -62,12 +62,13 @@ Para atender à arquitetura da aplicação e respeitar os Requisitos Não Funcio
 - **Front-end:** Google Cloud Storage (Static Website Hosting) ou Firebase Hosting para servir os arquivos estáticos (HTML/CSS/JS) com alta disponibilidade e baixo custo.
 - **Back-end (API C#):** Google Compute Engine (GCE) com instância `e2-micro` para hospedar a API ASP.NET Core, mantendo o controle do ambiente Linux e das dependências.
 - **Banco de Dados:** Google Cloud SQL (PostgreSQL) para garantir a integridade relacional das tabelas de usuários, livros e interações, automatizando rotinas de backup e segurança.
-- **Mineração de Dados e Mensageria (IA):** Arquitetura orientada a eventos usando **Google Cloud Pub/Sub**. As interações dos usuários (ex: salvar um livro) disparam eventos no tópico `aula-pub`. Em segundo plano, o script de Machine Learning atua como *Subscriber*, consumindo as mensagens de forma assíncrona para recalcular recomendações sem bloquear o tempo de resposta da API principal.
+- **Mineração de Dados e Mensageria (IA):** Arquitetura orientada a eventos. O planejamento previa Google Cloud Pub/Sub; na implementação (Sprint 3) foi adotado o **Azure Service Bus**, descrito na seção [Sprint 3 — Mensageria com Azure Service Bus](#sprint-3--mensageria-com-azure-service-bus).
 
 Instruções de execução:
 
 - API C#: [`src/README.md`](src/README.md)
 - Pipeline de ML: [`ml/README.md`](ml/README.md)
+- Consumidor de mensagens: [`mensageria/README.md`](mensageria/README.md)
 
 
 ## Sprint 2 — Preparação do banco de dados
@@ -152,3 +153,42 @@ Depois do deploy, abrir `https://nextread-frontend.onrender.com/livro/1` direto 
 página: se aparecer 404, o rewrite está faltando.
 
 ### Link do Site: [NextRead](https://nextread-frontend.onrender.com/)
+
+## Sprint 3 — Mensageria com Azure Service Bus
+
+A API e o consumidor de mensagens são dois sistemas separados, em linguagens diferentes, que
+só conversam por uma fila do **Azure Service Bus**:
+
+```
+web/mobile ──HTTP──► API C# ──envia──► [Azure Service Bus: fila nextread-recomendacoes]
+                                                   │
+                       mensageria/ (Python) ◄──recebe──┘ ──grava──► PostgreSQL (interacoes)
+```
+
+- **Quem publica:** a API, depois que a ação deu certo no banco — `salvou` e `removeu_salvo`
+  (livros salvos) e `visualizacao` (detalhe do livro, só com usuário logado). A resposta não
+  espera o processamento; se o Service Bus estiver fora do ar ou sem configuração, a API só
+  registra no log e continua funcionando.
+- **Quem consome:** [`mensageria/`](mensageria/README.md), que confirma a mensagem quando grava,
+  manda para a *dead-letter* quando ela é inválida e devolve para a fila quando o banco está fora.
+- **Sem duplicar:** cada mensagem tem um `id_evento`; a coluna única em `interacoes`
+  (`database/04_mensageria.sql`) impede gravar a mesma interação duas vezes quando o Service Bus
+  reentrega a mensagem.
+
+### Configurar
+
+1. Banco: rodar `database/04_mensageria.sql` (local **e** produção; pode rodar mais de uma vez).
+2. API: em `src/Livros.Api/appsettings.Development.json` (modelo em
+   `appsettings.Development.json.example`), seção `ServiceBus` com `Conexao` (cadeia de conexão da
+   política SAS da fila) e `Fila`. No Render: variáveis `ServiceBus__Conexao` e `ServiceBus__Fila`.
+3. Consumidor: copiar `mensageria/.env.example` para `mensageria/.env` e preencher.
+
+As cadeias de conexão nunca vão para o repositório.
+
+### Testes
+
+```bash
+dotnet test src/Livros.slnx
+cd mensageria && .venv/Scripts/python -m pytest
+```
+

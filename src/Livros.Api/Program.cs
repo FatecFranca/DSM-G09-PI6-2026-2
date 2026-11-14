@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Livros.Api.Configuracoes;
+using Livros.Api.Mensageria;
 using Livros.Api.Services;
 using Livros.Dados;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -45,6 +46,7 @@ construtor.Services.AddScoped<RecomendacoesService>();
 construtor.Services.AddScoped<UsuariosService>();
 construtor.Services.AddScoped<LivrosSalvosService>();
 construtor.Services.AddScoped<AutenticacaoService>();
+construtor.Services.AdicionarMensageria(construtor.Configuration);
 
 construtor.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(opcoes =>

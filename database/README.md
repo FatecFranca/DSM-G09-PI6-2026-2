@@ -20,14 +20,15 @@ Esta etapa completa o **script de criação das quatro tabelas-base**, que são 
 
    Se `dotnet ef` não estiver instalado: `dotnet tool install --global dotnet-ef` (use a versão major compatível com o EF Core do projeto). Se o projeto já possui a tabela e a migration está registrada, o EF Core não deve recriá-la.
 3. Execute `02_dados_teste.sql` no pgAdmin. Ele insere até **12 livros fictícios**, de forma idempotente quanto a pares título/autor. É apenas um conjunto de demonstração, não o dataset usado no trabalho de mineração.
-4. Execute `03_verificar_banco.sql`. A saída deve listar as cinco tabelas e mostrar **ao menos 12 livros** em um banco vazio criado com esses passos.
-5. Inicie a API com:
+4. Execute `04_mensageria.sql`. Ele adiciona a coluna `id_evento` (única) em `interacoes`, usada pelo consumidor da fila do Azure Service Bus para não gravar a mesma mensagem duas vezes. Pode rodar mais de uma vez. Rode também no banco de produção.
+5. Execute `03_verificar_banco.sql`. A saída deve listar as cinco tabelas e mostrar **ao menos 12 livros** em um banco vazio criado com esses passos.
+6. Inicie a API com:
 
    ```powershell
    dotnet run --project src/Livros.Api --launch-profile http
    ```
 
-6. Abra `http://localhost:5500/explorar` com o front iniciado (`cd web && npm ci && npm run dev`, veja o README principal), ou consulte `GET /livros` no Swagger. Confira a porta da API no perfil escolhido.
+7. Abra `http://localhost:5500/explorar` com o front iniciado (`cd web && npm ci && npm run dev`, veja o README principal), ou consulte `GET /livros` no Swagger. Confira a porta da API no perfil escolhido.
 
 ## Alternativa com dataset real
 

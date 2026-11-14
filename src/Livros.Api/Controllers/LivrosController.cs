@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using Livros.Api.Configuracoes;
 using Livros.Api.Dtos;
+using Livros.Api.Mensageria;
 using Livros.Api.Services;
+using Livros.Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,7 +12,10 @@ namespace Livros.Api.Controllers;
 [ApiController]
 [Route("livros")]
 [Tags("Livros")]
-public class LivrosController(LivrosService servico, IOptions<OpcoesDaApi> opcoes) : ControllerBase
+public class LivrosController(
+    LivrosService servico,
+    IOptions<OpcoesDaApi> opcoes,
+    IPublicadorDeInteracoes publicador) : ControllerBase
 {
     private readonly OpcoesDaApi _opcoes = opcoes.Value;
 
@@ -40,6 +46,13 @@ public class LivrosController(LivrosService servico, IOptions<OpcoesDaApi> opcoe
         if (livro is null)
         {
             return NotFound(new ProblemDetails { Title = $"livro {idLivro} nao encontrado", Status = 404 });
+        }
+
+        // a rota e publica; so usuario logado gera interacao (id_usuario e obrigatorio na tabela)
+        if (User.Identity?.IsAuthenticated == true
+            && long.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var idUsuario))
+        {
+            await publicador.PublicarAsync(EventoInteracao.Criar(TiposDeInteracao.Visualizacao, idUsuario, idLivro));
         }
 
         return livro.ParaDetalhe();

@@ -7,6 +7,7 @@ public class Interacao
     public long IdLivro { get; set; }
     public string TipoInteracao { get; set; } = null!;
     public DateTimeOffset DataInteracao { get; set; }
+    public Guid? IdEvento { get; set; }
 
     public Usuario Usuario { get; set; } = null!;
     public Livro Livro { get; set; } = null!;

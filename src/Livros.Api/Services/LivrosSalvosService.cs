@@ -1,4 +1,5 @@
 using Livros.Api.Dtos;
+using Livros.Api.Mensageria;
 using Livros.Dados;
 using Livros.Dominio.Entidades;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace Livros.Api.Services;
 
 public enum ResultadoSalvo { Criado, JaExistia, UsuarioNaoEncontrado, LivroNaoEncontrado, Removido, NaoEncontrado }
 
-public class LivrosSalvosService(ContextoLivros contexto)
+public class LivrosSalvosService(ContextoLivros contexto, IPublicadorDeInteracoes publicador)
 {
     public async Task<IReadOnlyList<LivroSalvoDto>?> ListarAsync(long usuarioId, CancellationToken ct)
     {
@@ -30,6 +31,7 @@ public class LivrosSalvosService(ContextoLivros contexto)
         salvo = new LivroSalvo { IdUsuario = usuarioId, IdLivro = livroId };
         contexto.LivrosSalvos.Add(salvo);
         await contexto.SaveChangesAsync(ct);
+        await publicador.PublicarAsync(EventoInteracao.Criar(TiposDeInteracao.Salvou, usuarioId, livroId));
         return (ResultadoSalvo.Criado, new(salvo.IdSalvo, salvo.DataSalvo, livro.ParaResumo()));
     }
 
@@ -40,6 +42,7 @@ public class LivrosSalvosService(ContextoLivros contexto)
         if (registro is null) return ResultadoSalvo.NaoEncontrado;
         contexto.LivrosSalvos.Remove(registro);
         await contexto.SaveChangesAsync(ct);
+        await publicador.PublicarAsync(EventoInteracao.Criar(TiposDeInteracao.RemoveuSalvo, usuarioId, livroId));
         return ResultadoSalvo.Removido;
     }
 }
